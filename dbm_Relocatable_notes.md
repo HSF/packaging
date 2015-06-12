@@ -206,6 +206,24 @@ much easier, methods for lookup of dependencies and self-location.
 They may also provide builtin support for resource files and other things.
 Provide some examples of this.
 
+Bash
+----
+For an executable script, it can be located using the `readlink` command on
+the `$0` argument, though this does not resolve hardlinks. Whilst GNU
+`readlink` can fully traverse softlinks using the `-f` argument, this is not
+portable.
+
+```Bash
+# GNU readlink only
+selfLocation=$(readlink -f $0)
+```
+
+For `readlink` implementations not supporting the `-f` argument, workarounds
+are needed. Deepending on the platform, these may vary from using Python
+(!, though not unreasonable on OS X platforms) to pure Bash/Sh implementations.
+The latter basically involve iterating over any sequence of symlinks.
+A discussion on this with example implementations is [covered on StackOverflow](http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac)
+
 Python
 ------
 Current file:
@@ -225,7 +243,22 @@ selfLocation = File.expand_path(__FILE__)
 
 Go
 --
-?
+Information from [Sebastien Binet](https://github.com/sbinet)
+
+> As you put a 'go' section in your brain dump, I feel compelled to pipe in :)
+>
+> go programs are statically linked (at least the pure-go ones) so the
+> issue of locating DSOs is moot.
+>
+> for other resources, the canonical way is to compile the assets inside
+> the binary:
+>
+> https://github.com/jteeuwen/go-bindata
+>
+> or locate them from $GOPATH (the $PYTHONPATH for Go):
+>
+> https://github.com/hwaf/gas
+
 
 Others?
 -------
