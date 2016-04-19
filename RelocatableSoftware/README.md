@@ -1,14 +1,29 @@
-Notes on Tools/Techniques for Relocatable Packages
+Relocatable Software: Issues, Tools and Techniques
 ==================================================
-This expands on notes already made in [the notes on packaging](dbm_Packaging_notes.md) related to *Relocatable Packages*. Though not an absolute
-requirement for packaging, making a project relocatable helps with the
-creation and installation of binary packages.
-
-A **Relocatable** project is one in which the contents of the project
+A **Relocatable** software package is one in which the contents of the package
 (programs, libraries, resource files) can be moved lock stock from its
 initial installation location to anywhere else on the filesystem and still
-run *without* user intervention. For example, say we initially install a
-project `Foo` as follows:
+run *without* user intervention. Implementing this ability in software
+provides several benefits, including
+
+- Minimal setup for end users, as they do not need to set package-specific
+  environment variables or edit configuration files
+- Easier binary packaging and deployment, as binaries do not require
+  installation at the same location either at install or use time (e.g.
+  NFS/AFS/CVMFS mount point)
+
+This document describes the issues that arise in implementing relocatability
+in software packages from the source code to binary packaging level, and 
+discusses tools and techniques to help the developer and end user. Several
+example projects in C++ and Python are provided as illustrations.
+Whilst primarily concerned with the "front line" programming languages
+used in HEP (C, C++ and Python), it is open to comments and examples
+from others in use or under consideration.
+
+What is Relocatability?
+=======================
+Say we install a package `Foo` that comprises a program, library and
+resource files:
 
 ```
 /home/
@@ -22,7 +37,8 @@ project `Foo` as follows:
           +- lib/             |             |
           |  +- libfoo.so <---- links to    |
           |  +- cmake/                      |
-          |  |  +- FooConfig.cmake          |
+          |  |  +- Foo/                     |
+          |  |     +- FooConfig.cmake       |
           |  +- pkgconfig/                  |
           |     +- Foo.pc                   |
           +- share/                         |
@@ -30,7 +46,7 @@ project `Foo` as follows:
                 +- resource.xml <------------ reads
 ```
 
-If `Foo` is relocatable, then we can move it like:
+If `Foo` is relocatable, then we can move its contents across the filesystem, e.g.:
 
 ```
 $ mv /home/user/Projects/Foo /home/user/Another/Workspace
@@ -48,7 +64,8 @@ $ mv /home/user/Projects/Foo /home/user/Another/Workspace
              +- lib/
              |  +- libfoo.so
              |  +- cmake/
-             |  |  +- FooConfig.cmake
+             |  |  +- Foo/
+             |  |     +- FooConfig.cmake
              |  +- pkgconfig/
              |     +- Foo.pc
              +- share/
@@ -56,44 +73,61 @@ $ mv /home/user/Projects/Foo /home/user/Another/Workspace
                    +- resource.xml
 ```
 
-and the user would be able to run `foo-program` without making any changes
+and the user would be able to run `foo-program` without making *any* changes
 either to the files comprising `Foo` or the runtime environment (`PATH`
-might be repointed, but `foo-program` would still be runnable via a fully
-qualified path). Note that when relocating, the files comprising `Foo` stay
-in the same locations relative to each other. Also, we have not considered
-the case where `Foo` uses, or is used by, other Projects. However, the
-above layout illustrates three aspects of relocatability:
+might be edited for convenience, but `foo-program` would still be runnable via a fully
+qualified path). Note that the relocation keeps the files comprising `Foo`
+in the same locations relative to each other. 
+[OS X Application and Framework Bundles/Packages](https://developer.apple.com/library/mac/documentation/CoreFoundation/Conceptual/CFBundles/Introduction/Introduction.html#//apple_ref/doc/uid/10000123i) 
+are the classic exemplar of relocatable programs and libraries respectively, and
+the term 'Portable Binary' is often used on Linux. 
 
-- How does `foo-program` locate its `libfoo.so` dependency at runtime?
+Though basic, this example illustrates three of the core issues of relocatability and
+the corresponding technical aspects:
+
+- How does `foo-program` locate its dynamic library `libfoo.so` dependency at runtime?
+  - Link/Run time lookup of dynamic libraries
 - How does `foo-program` locate its `resource.xml` file at runtime?
-- How do Foo's CMake and pkg-config support files find libfoo and headers
+  - Executable self-location on the filesystem at runtime
+- How do Foo's CMake and pkg-config support files find `Foo`'s library and headers
   when used by a client?
+  - Script self-location on the filesystem at runtime
 
-These translate into the technical aspects
+A further item to be considered is what happens if `Foo` uses files from another
+package (e.g. `foo-program` links to "`libbar`"). This is deferred to a later section.
 
-- Dynamic library linking/loading with runtime, absolute and relative paths
-- Executable self-location on the filesystem
-- Script self-location on the filesystem
+Whilst the example only illustrates moving a package across a local filesystem, it is
+equally valid for moves across network filesystems with different mount points.
+Of course the package is then only usable if the OS/toolchain mounting the filesystem is
+the same, or binary compatible with, the OS/toolchain the package was built for. Though
+not a direct issue for relocatability, programming and compiling for binary compatibility
+are helpful for simplifying binary packaging and deployment. The issues here
+include:
 
-[OS X Application and Framework Bundles/Packages](https://developer.apple.com/library/mac/documentation/CoreFoundation/Conceptual/CFBundles/Introduction/Introduction.html#//apple_ref/doc/uid/10000123i) are the classic exemplar
-of relocatable programs and libraries respectively, but
-the same techniques can be applied across all platforms (the term
-'Portable Binary' is often used on Linux). Relocatability is
-helpful for packaging as it means that binary packages are easy to implement
-without requiring a fixed installation root.
+- Software development
+  - Clear and well-managed API/ABI versioning, especially for compiled languages
+  - Program for multiple versions of any dependencies (assumes they have good API/ABI versioning!!)
+  - Hide dependencies as implementation details as far as possible
+- Building binaries
+  - Target minimal system API/ABI, e.g. `-mmacosx-min-version` on OS X or build for suitable
+    minimum glibc on Linux
+  - On Linux, consider "standalone" toolkit of glibc, binutils, gcc
 
+Here, the first is mostly a training/policy issue for individual projects,
+and the second a policy issues for packagers.
 
-Relocatability with Programs and Dynamic Libraries
-==================================================
+(Re)Locating Dynamic Libraries
+==============================
 How the dynamic linker/loader works on different platforms. Topics include:
 
-- Dynamic loader paths, including `LD_LIBRARY_PATH` and `RPATH` (`@rpath`
+- Dynamic loader paths, including `LD_LIBRARY_PATH`, `RPATH` and `RUNPATH` (inc. `@rpath`
 and others on OS X, `$ORIGIN` on Linux), plus Windows DLL search paths.
 - Relative RPATHs, both on [OS X](http://www.kitware.com/blog/home/post/510) and [Linux](http://linux.die.net/man/8/ld.so)
 - Lookup paths when implementing "Plugin" architectures
 
-Executable Self-Location
-========================
+
+Self-Location of Compiled and Interpreted Executables
+=====================================================
 How can a program or library introspect itself to find out where on the
 filesystem it was loaded from? If we know this location, then default
 resource files and search paths can easily be derived from known relative
@@ -117,18 +151,23 @@ const char* resourcePath = getenv("FOO_RESOURCE_PATH");
 ```
 
 Whilst this does enable relocatability, it relies on the user setting this
-variable correctly (and knowing to do so). Alternately, `foo-program` could
-be wrapped in a shell script that sets this variable using shell-based
-self-location. This creates another level of indirection for the user and
-may be vulnerable to the same soft/hardlink resolution.
+variable correctly, knowing to do so, and changing it if the package is moved. 
+Alternately, `foo-program` could be wrapped in a shell script that sets this 
+variable using shell-based self-location. This creates another level of 
+indirection for the user and may be vulnerable to the same soft/hardlink resolution.
 
 Though C/C++ applications *may* get passed a string *representing* the program name as the zeroth element of the `argv` array:
 
 ```C++
-int main(int argc, char* argv[])
+int main(int argc, char* argv[]) {
+  std::cout << argv[0] << "\n";
+}
 ```
 
-this is not *guaranteed* to be the actual filesystem location of the program (see, for example [this discussion](http://stackoverflow.com/questions/2050961/is-argv0-name-of-executable-an-accepted-standard-or-just-a-common-conventi)).
+it is not *guaranteed* to be the actual filesystem location of the program 
+(see, for example 
+[this discussion](http://stackoverflow.com/questions/2050961/is-argv0-name-of-executable-an-accepted-standard-or-just-a-common-conventi)
+).
 In particular, the actual invocation of a program may be through a soft or hard link whose
 filesystem location is completely separate from that of the executable.
 Though links can be followed to some extent, hardlinks in particular cannot
@@ -138,9 +177,19 @@ easily be resolved. Rather, most self-location relies on querying the
 Some basic techniques, but also APIs including
 
 - [binreloc](https://github.com/drbenmorgan/Resourceful) at low level
-- Application objects in frameworks such as [Qt](http://doc.qt.io/qt-5/qcoreapplication.html#applicationDirPath) and [Poco](http://pocoproject.org/docs/Poco.Util.Application.html)
+- Application objects in frameworks such as 
+  [Qt](http://doc.qt.io/qt-5/qcoreapplication.html#applicationDirPath)
+  [Poco](http://pocoproject.org/docs/Poco.Util.Application.html)
 
 Other languages may have different techniques or builtin tools (see below).
+
+There are some paths to resource files that, depending on exact use case, may require 
+hard-coding or use of standard environment variables. On UNIX, these could include
+
+- `/etc`
+- `/var`
+- `/tmp` or `TMPDIR`
+
 
 Scripting/Development Support Tools
 ===================================
@@ -164,15 +213,15 @@ Generally, this can be handled with
 or link time dependencies.
   - The standard CMake command line/environment variables such as [`CMAKE_PREFIX_PATH`](http://www.cmake.org/cmake/help/v3.2/variable/CMAKE_PREFIX_PATH.html) should used to point CMake to the right search prefixes
   - That can be handled by the configuration management or build wrapper
-    systems (e.g. Homebrew's sh/superenv or Nix environments for example).
+    systems (e.g. spack's env setup, Homebrew's sh/superenv or Nix environments for example).
 
-However, this is not neccessarily a complete solution.
+However, this is not necessarily a complete solution.
 
 Pkg-Config
 ---------
 Scripts for the [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config/)
 tool can also be made relocatable by using the builtin `pcfiledir` variable.
-This expands to the directpory holding the `.pc` file, and so for our
+This expands to the directory holding the `.pc` file, and so for our
 example project Foo could be written as
 
 ```
@@ -197,6 +246,20 @@ build wrapper.
 Other tools?
 ------------
 ?
+
+Linked Relocatability
+=====================
+What happens to relocatability when we have two packages with a dependency?
+For example `Foo` and `Bar`, with `Foo` linking to `libbar` from `Bar`.
+
+1. Can move `Foo` if its `RPATH` contains absolute path to `libbar`.
+2. Cannot move `Bar` without updating `Foo`'s RPATH or using dynamic
+   loader paths
+3. Can package and deploy both `Foo` and `Bar` provided relative RPATHs
+   are used and both stay in the same relative location to each other.
+
+Also consider case of text/resource file dependency.
+
 
 Other Languages
 ===============
