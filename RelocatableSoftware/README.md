@@ -174,14 +174,14 @@ Though links can be followed to some extent, hardlinks in particular cannot
 easily be resolved. Rather, most self-location relies on querying the
 *process* itself.
 
-Some basic techniques, but also APIs including
+Some basic techniques, but also APIs, are demonstrated in the [`Relocatable`](Relocatable)
+example project, including
 
-- [binreloc](https://github.com/drbenmorgan/Resourceful) at low level
+- [binreloc](https://github.com/drbenmorgan/Resourceful) at low level for C/C++
 - Application objects in frameworks such as 
   [Qt](http://doc.qt.io/qt-5/qcoreapplication.html#applicationDirPath)
-  [Poco](http://pocoproject.org/docs/Poco.Util.Application.html)
-
-Other languages may have different techniques or builtin tools (see below).
+  [Poco](http://pocoproject.org/docs/Poco.Util.Application.html) for C/C++
+- Techniques from Python and Ruby interpreted languages.
 
 There are some paths to resource files that, depending on exact use case, may require 
 hard-coding or use of standard environment variables. On UNIX, these could include
