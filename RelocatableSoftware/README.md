@@ -125,6 +125,7 @@ and others on OS X, `$ORIGIN` on Linux), plus Windows DLL search paths.
 - Relative RPATHs, both on [OS X](http://www.kitware.com/blog/home/post/510) and [Linux](http://linux.die.net/man/8/ld.so)
 - Lookup paths when implementing "Plugin" architectures
 
+**NOTE**: Remember to document the odd difference in behaviour of `$ORIGIN` between link and run times. Basically, it appears that binutils `ld` *does not* expand it at link time, which can result in error messages about needing `-rpath-link`. This *appears* to be a [missing feature or bug in binutils](https://sourceware.org/bugzilla/show_bug.cgi?id=16936)
 
 Self-Location of Compiled and Interpreted Executables
 =====================================================
