@@ -326,3 +326,16 @@ Information from [Sebastien Binet](https://github.com/sbinet)
 Others?
 -------
 ?
+
+Patching Upstream Software
+==========================
+The preceeding sections cover cases where "we" are developing the software, or are in a position
+to easily patch it. Typical HEP software stacks will use a large number of packages not
+directly maintained by the experiment/community using them, and not all of them may meet the
+criteria for full relocatability. How to handle these?
+
+1. If only RPATHs or text files are involved, these should(?) be handled by the packaging system/tools (`patchelf`, `otool`, `install_name_tool` etc)
+2. If paths are hard-coded in binary files, and patching in, say, binreloc support isn't supported, 
+   it may be possible to patch the binary file directly. TODO: is this possible? what tools are there? can these be integrated in packaging/deplyment systems?
+   - Note however that this is still results in a hard-coded path rather than one derived at runtime.
+3. Runtime/chroot based tools like [PRoot](https://github.com/proot-me/PRoot/blob/master/doc/proot/manual.txt)?
