@@ -105,16 +105,21 @@ are helpful for simplifying binary packaging and deployment. The issues here
 include:
 
 - Software development
+  - Mostly a training/policy issue for individual projects (but perhaps HSF can help) 
   - Clear and well-managed API/ABI versioning, especially for compiled languages
+    - Ensures software can be used by as wide a range of upstream clients as possible
+    - Nevertheless, can be tricky for [languages like C++](https://community.kde.org/Policies/Binary_Compatibility_Issues_With_C%2B%2B)
+    - There [are tools to help check compatibility](https://fedoraproject.org/wiki/How_to_check_for_ABI_changes_in_a_package) at least for ELF, but needs a more thorough survey.
   - Program for multiple versions of any dependencies (assumes they have good API/ABI versioning!!)
-  - Hide dependencies as implementation details as far as possible
+    - Dependecies should provide a versioning header [as per HSF (draft) guidelines](https://github.com/HEP-SF/documents/blob/master/HSF-TN/draft-2016-PROJ/draft-HSF-TN-2016-PROJ.md)
+  - Hide dependencies as implementation details as far as possible.
+  - Consider versioned symbols and/or inlined namespaces?
 - Building binaries
+  - Policy issue for packager(s). 
   - Target minimal system API/ABI, e.g. `-mmacosx-min-version` on OS X or build for suitable
-    minimum glibc on Linux
-  - On Linux, consider "standalone" toolkit of glibc, binutils, gcc
+    minimum glibc on Linux.
+  - On Linux, consider "standalone" toolkit of glibc, binutils, gcc.
 
-Here, the first is mostly a training/policy issue for individual projects,
-and the second a policy issues for packagers.
 
 (Re)Locating Dynamic Libraries
 ==============================
@@ -340,3 +345,4 @@ criteria for full relocatability. How to handle these?
    it may be possible to patch the binary file directly. TODO: is this possible? what tools are there? can these be integrated in packaging/deplyment systems?
    - Note however that this is still results in a hard-coded path rather than one derived at runtime.
 3. Runtime/chroot based tools like [PRoot](https://github.com/proot-me/PRoot/blob/master/doc/proot/manual.txt)?
+
