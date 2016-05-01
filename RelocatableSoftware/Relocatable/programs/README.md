@@ -25,9 +25,21 @@ Uses Poco's builtin `Application`class for self-location. This requires
 Poco's [`Util`](http://pocoproject.org/docs/Poco.Util.html) library.
 Should be portable to all of Poco's supported platforms.
 
+The program does not go any further than self-location. The same
+ideas/techniques as shown in `hsfreloc` can be used to derive
+additional locations.
+
 `hsfreloc-qt`
 ------------
 Uses Qt5's [`QAaplication`](http://doc.qt.io/qt-5/qapplication.html) class
 for program self-location. This requires Qt5's `QtCore` library.
 Should be portable to all of Qt5's supported platforms.
+
+The program does not go any further than self-location. The same
+ideas/techniques as shown in `hsfreloc` can be used to derive
+additional locations. Note that Qt also provides its own resource and
+plugin system, so these can be used instead (and probably should
+be preferred it Qt is in use anyway).
+
+
 
