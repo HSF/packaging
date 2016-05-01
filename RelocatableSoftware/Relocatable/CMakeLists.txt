@@ -1,6 +1,6 @@
 # - Build/Test Examples for Relocatability
 cmake_minimum_required(VERSION 3.3)
-project(HSFRelocatable VERSION 0.1.0)
+project(HSFReloc VERSION 0.1.0)
 
 # - Use standard install locations
 # These are, by default, relative to CMAKE_PREFIX_PATH so permit relocatability
