@@ -1,0 +1,47 @@
+# - Build application/library using binreloc for self-location
+
+# - Configure binreloc
+# Just mangles symbols which is not strictly neccessary for programs.
+# However, when we use it in libraries, we *might* get symbol clashes if
+# we link together several libraries, each with their own binreloc code.
+string(RANDOM LENGTH 16 MANGLE_BINRELOC)
+set(MANGLE_BINRELOC "hsf_reloc_binreloc${MANGLE_BINRELOC}")
+configure_file(binreloc/hsf_binreloc.h.in binreloc/hsf_binreloc.h @ONLY)
+
+add_executable(hsfreloc
+  binreloc/hsf_binreloc.h
+  binreloc/hsf_binreloc.c
+  binreloc/HSFReloc.h
+  binreloc/HSFReloc.cpp
+  hsfreloc.cpp
+  )
+target_include_directories(hsfreloc PRIVATE
+  ${CMAKE_CURRENT_BINARY_DIR}/binreloc
+  ${CMAKE_CURRENT_SOURCE_DIR}/binreloc
+  )
+target_compile_definitions(hsfreloc PRIVATE ENABLE_BINRELOC)
+
+#-----------------------------------------------------------------------
+# - Optional Poco demo for its builtin self location
+# - Only need Util lib directly for Application base class
+find_package(Poco QUIET COMPONENTS Util)
+
+if(NOT Poco_FOUND)
+  message(STATUS "Poco not found, disabling build of hsfreloc-poco")
+else()
+  add_executable(hsfreloc-poco hsfreloc-poco.cpp)
+  target_link_libraries(hsfreloc-poco Poco::Util)
+endif()
+
+#-----------------------------------------------------------------------
+# - Optional Qt5 deom for its builtin self-location
+# - Only need core lib
+find_package(Qt5Core QUIET)
+
+if(NOT Qt5Core_FOUND)
+  message(STATUS "Qt5Core not found, disabling build of hsfreloc-qt")
+else()
+  add_executable(hsfreloc-qt hsfreloc-qt.cpp)
+  target_link_libraries(hsfreloc-qt Qt5::Core)
+endif()
+

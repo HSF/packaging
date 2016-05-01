@@ -32,7 +32,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # - Build subdirs
-add_subdirectory(binreloc)
-add_subdirectory(qt)
-add_subdirectory(poco)
+add_subdirectory(programs)
 
+# - copy/configure resources to build dir
+file(COPY resources
+  DESTINATION ${HSFRelocatable_BUILDPRODUCT_DIRECTORY}/${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}
+  )
