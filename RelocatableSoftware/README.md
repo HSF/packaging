@@ -191,7 +191,7 @@ Ruby's construct is very similar to Python, using the `File` builtin
 selfLocation = File.expand_path(__FILE__)
 ```
 
-This should be equally valid
+This should be equally valid for programs and gems/packages.
 
 Go
 --
