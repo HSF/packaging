@@ -38,3 +38,8 @@ If you configure the project for an IDE like Xcode,
 the `BuildProducts` directory will contain an extra level of directories
 to support each build type (`Release`, `Debug` etc)
 
+Scripting Languages
+===================
+The directories under [scripting](scripting) contain (very) basic
+examples of relocatable Python and Ruby programs.
+
