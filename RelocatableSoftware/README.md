@@ -230,7 +230,6 @@ Bash/Sh implementations. The latter basically involve iterating over any
 sequence of symlinks. A discussion on this with example implementations is [covered on StackOverflow](http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac)
 
 
-
 C/C++
 -----
 Though C/C++ applications *may* get passed a string *representing* the program name as the zeroth element of the `argv` argument to `main`:
@@ -254,9 +253,9 @@ easily be resolved. Rather, most self-location relies on querying the
 Some basic techniques, but also APIs, are demonstrated in the [`HSFReloc`](HSFReloc`) example project, including
 
 - [binreloc](https://github.com/drbenmorgan/Resourceful) at low level for C/C++
-- Application objects in frameworks such as
-  [Qt](http://doc.qt.io/qt-5/qcoreapplication.html#applicationDirPath)
-  [Poco](http://pocoproject.org/docs/Poco.Util.Application.html) for C/C++
+- C++ Application objects in frameworks such as:
+  - [Qt](http://doc.qt.io/qt-5/qcoreapplication.html#applicationDirPath)
+  - [Poco](http://pocoproject.org/docs/Poco.Util.Application.html)
 
 There are some paths to resource files that, depending on exact use case, may require
 hard-coding or use of standard environment variables. On UNIX, these could include
@@ -267,6 +266,14 @@ hard-coding or use of standard environment variables. On UNIX, these could inclu
 
 (Re)Locating Dynamic Libraries
 ==============================
+A non-trivial package will usually be partioned into a main
+program/libraries linking to 1-N internal, plus 0-M external, libraries.
+For [static libraries/linking](https://en.wikipedia.org/wiki/Static_library), the libraries only need locating at build/link time.
+When [dynamic/shared libraries](https://en.wikipedia.org/wiki/Dynamic_linker)
+are used, client programs/libraries must locate the needed libraries at
+both build/link and *run* times, and it is this run time location
+that is discussed here.
+
 How the dynamic linker/loader works on different platforms. Topics include:
 
 - Dynamic loader paths, including `LD_LIBRARY_PATH`, `RPATH` and `RUNPATH` (inc. `@rpath`
@@ -275,6 +282,13 @@ and others on OS X, `$ORIGIN` on Linux), plus Windows DLL search paths.
 - Lookup paths when implementing "Plugin" architectures
 
 **NOTE**: Remember to document the odd difference in behaviour of `$ORIGIN` between link and run times. Basically, it appears that binutils `ld` *does not* expand it at link time, which can result in error messages about needing `-rpath-link`. This *appears* to be a [missing feature or bug in binutils](https://sourceware.org/bugzilla/show_bug.cgi?id=16936)
+
+**NOTE**: Behaviour of tools of as CMake and Autotools, which encode
+the rpath into the locally built binaries by default. This enables them
+to be run directly for testing and guarantees that they will find their
+dependencies. At install time, rpaths are usually stripped, unless
+configured otherwise.
+
 
 Scripting/Development Support Tools
 ===================================
