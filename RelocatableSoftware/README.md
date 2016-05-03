@@ -281,6 +281,31 @@ and others on OS X, `$ORIGIN` on Linux), plus Windows DLL search paths.
 - Relative RPATHs, both on [OS X](http://www.kitware.com/blog/home/post/510) and [Linux](http://linux.die.net/man/8/ld.so)
 - Lookup paths when implementing "Plugin" architectures
 
+Dynamic programs and libraries can be queried by system tools to display what they link to and how these paths are resolved.
+To query what a dynamic executable links to, the commands
+
+```console
+... Linux ...
+$ ldd <dynamicexecutable>
+
+... OS X ...
+$ otool -L <dynamicexecutable>
+```
+
+may be used. Additionally, detailed runtime information on how the dynamic linker/loader resolves links when loading/running the program can be obtained by setting platform specific environment variables, e.g.
+
+```console
+... Linux ...
+$ LD_DEBUG=all <program>
+
+... OS X ...
+$ export DYLD_PRINT_LIBRARIES=1
+$ export DYLD_PRINT_RPATHS=1
+$ <program>
+```
+
+These can be useful for tracing runtime issues. See the `ld.so/ld-linux.so` (Linux) or `dyld` (OS X) `man` pages for additional details.
+
 **NOTE**: Remember to document the odd difference in behaviour of `$ORIGIN` between link and run times. Basically, it appears that binutils `ld` *does not* expand it at link time, which can result in error messages about needing `-rpath-link`. This *appears* to be a [missing feature or bug in binutils](https://sourceware.org/bugzilla/show_bug.cgi?id=16936)
 
 **NOTE**: Behaviour of tools of as CMake and Autotools, which encode
