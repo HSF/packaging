@@ -31,7 +31,7 @@ resource files:
     +- Projects/
        +- HSFReloc/
           +- bin/
-          |  +- hsfreloc <------------------- <---
+          |  +- hsfreloc >------------------- >---
           +- include/                       |    |
           |  +- hsfreloc.h                  |    |
           +- lib/                           |    |
@@ -79,7 +79,7 @@ might be edited for convenience, but `hsfreloc` would still be runnable via a fu
 qualified path). Note that the relocation keeps the files comprising
 `HSFreloc` in the same locations relative to each other.
 [OS X Application and Framework Bundles/Packages](https://developer.apple.com/library/mac/documentation/CoreFoundation/Conceptual/CFBundles/Introduction/Introduction.html#//apple_ref/doc/uid/10000123i)
-are the classic exemplar of relocatable programs and libraries respectively, and
+are the classic example of relocatable programs and libraries respectively, and
 the term 'Portable Binary' is often used on Linux.
 
 Though basic, this example illustrates three of the core issues of relocatability and
@@ -88,18 +88,18 @@ the corresponding technical aspects:
 - How does `hsfreloc` locate its dynamic library `libhsfreloc.so` dependency at runtime?
   - Link/Run time lookup of dynamic libraries
 - How does `hsfreloc` locate its `resource.txt` file at runtime?
-  - Self-location by binaries on the filesystem at runtime
+  - Binary self-location on the filesystem at runtime
 - How do `HSFReloc`'s CMake and pkg-config support files find `HSFReloc`'s library and headers
   when used by a client?
   - Script self-location on the filesystem at runtime
 
 A further item to be considered is what happens if `HSFReloc` uses files
-from another package (e.g. `hsfreloc` or `libhsfreloc` links to "`libbar`").
+from another package (e.g. `hsfreloc` or `libhsfreloc` links to a "`libbar`").
 This is deferred to a later section.
 
 Whilst the example only illustrates moving a package across a local
 filesystem, it is equally valid for moves across network filesystems with
-different mount points. Of course the package is then only usable if the
+different mount points or even between different systems. Of course the package is then only usable if the
 OS/toolchain mounting the filesystem is the same, or binary compatible
 with, the OS/toolchain the package was built for. Though not a direct
 issue for relocatability, programming and compiling for binary
@@ -126,7 +126,7 @@ compatibility are helpful for simplifying binary packaging and deployment.
 
 Self-Location of Compiled and Interpreted Executables
 =====================================================
-How can a program or library introspect itself to find out where on the
+How can a program or library introspect itself when running to find out where on the
 filesystem it was loaded from? If we know this location, then default
 resource files and search paths can easily be derived from known relative
 locations. For example, say the `Foo` application is written in C++
@@ -164,9 +164,9 @@ self-location in applications and libraries. Self-locating *resources*
 (e.g. `A.txt` "loads" `../extra/B.txt` in a hierarchical system) is
 outside the scope of this document as it is highly implementation
 dependent. The sections below describe
-the minimal (as far as is known!) code needed to obtain the location
+the minimal (as far as is known) code needed to obtain the location
 of the currently executing program or library for a handful of languages,
-and additions are welcome! Note that languages may also have additional
+and additions are welcome. Note that languages may have additional
 builtins or simple extensions to handle either self-location or the
 specific use case of locating resource files (e.g., see the notes
 on the Go language below).
@@ -224,7 +224,7 @@ selfLocation=$(readlink -f $0)
 ```
 
 For `readlink` implementations not supporting the `-f` argument,
-workarounds are needed. Deepending on the platform, these may vary from
+workarounds are needed. Depending on the platform, these may vary from
 using Python (!, though not unreasonable on OS X platforms) to pure
 Bash/Sh implementations. The latter basically involve iterating over any
 sequence of symlinks. A discussion on this with example implementations is [covered on StackOverflow](http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac)
@@ -240,7 +240,7 @@ int main(int argc, char* argv[]) {
 }
 ```
 
-it is not *guaranteed* to be the actual filesystem location of the program
+this is not *guaranteed* to be the actual filesystem location of the program
 (see, for example
 [this discussion](http://stackoverflow.com/questions/2050961/is-argv0-name-of-executable-an-accepted-standard-or-just-a-common-conventi)
 ).
@@ -274,12 +274,12 @@ are used, client programs/libraries must locate the needed libraries at
 both build/link and *run* times, and it is this run time location
 that is discussed here.
 
-How the dynamic linker/loader works on different platforms. Topics include:
+**TODO**: How the dynamic linker/loader works on different platforms. Topics include:
 
 - Dynamic loader paths, including `LD_LIBRARY_PATH`, `RPATH` and `RUNPATH` (inc. `@rpath`
 and others on OS X, `$ORIGIN` on Linux), plus Windows DLL search paths.
 - Relative RPATHs, both on [OS X](http://www.kitware.com/blog/home/post/510) and [Linux](http://linux.die.net/man/8/ld.so)
-- Lookup paths when implementing "Plugin" architectures
+- Lookup paths when implementing "Plugin" architectures (i.e. loading dynamic libraries into an already running program)
 
 Dynamic programs and libraries can be queried by system tools to display what they link to and how these paths are resolved.
 To query what a dynamic executable links to, the commands
@@ -306,9 +306,9 @@ $ <program>
 
 These can be useful for tracing runtime issues. See the `ld.so/ld-linux.so` (Linux) or `dyld` (OS X) `man` pages for additional details.
 
-**NOTE**: Remember to document the odd difference in behaviour of `$ORIGIN` between link and run times. Basically, it appears that binutils `ld` *does not* expand it at link time, which can result in error messages about needing `-rpath-link`. This *appears* to be a [missing feature or bug in binutils](https://sourceware.org/bugzilla/show_bug.cgi?id=16936)
+**TODO**: Remember to document the odd difference in behaviour of `$ORIGIN` between link and run times. Basically, it appears that binutils `ld` *does not* expand it at link time, which can result in error messages about needing `-rpath-link`. This *appears* to be a [missing feature or bug in binutils](https://sourceware.org/bugzilla/show_bug.cgi?id=16936)
 
-**NOTE**: Behaviour of tools of as CMake and Autotools, which encode
+**TODO**: Behaviour of tools of as CMake and Autotools, which encode
 the rpath into the locally built binaries by default. This enables them
 to be run directly for testing and guarantees that they will find their
 dependencies. At install time, rpaths are usually stripped, unless
@@ -320,24 +320,28 @@ Scripting/Development Support Tools
 CMake
 -----
 To support use of a Project by a CMake based client project, scripts for
-use with CMake's [`find_package`](http://www.cmake.org/cmake/help/v3.2/command/find_package.html) command in "config" mode should be provided.
-If the Project itself is built with CMake, these are very easy to create
-in using the [`CMakePackageConfigHelpers`](http://www.cmake.org/cmake/help/v3.2/module/CMakePackageConfigHelpers.html) module
+use with CMake's [`find_package`](http://www.cmake.org/cmake/help/v3.2/command/find_package.html) command in "config" 
+mode should be provided. A `FindPACKAGENAME.cmake` should *not* be implemented, including the use of CMake commands
+like `find_path`, `find_library` as these are intended to locate packages not supplying any CMake support files. CMake
+"ProjectConfig.cmake" files are installed alongside the project and can self-locate the project's headers/libraries/executables
+without having to find anything.
+
+If the Project itself is built with CMake, "ProjectConfig.cmake" files are very easy to create
+ via the [`CMakePackageConfigHelpers`](http://www.cmake.org/cmake/help/v3.2/module/CMakePackageConfigHelpers.html) module
 and the [`install`](http://www.cmake.org/cmake/help/v3.2/command/install.html) command's `EXPORT` signature.
-These make use of CMake's [imported targets](http://www.cmake.org/cmake/help/v3.2/command/add_library.html?#imported-libraries) and the ability for
-scripts to self-locate to allow the resultant "ProjectConfig.cmake" file(s)
+These make use of CMake's [imported targets](http://www.cmake.org/cmake/help/v3.2/command/add_library.html?#imported-libraries) and the ability for CMake scripts to self-locate themselves (e.g. [`CMAKE_CURRENT_LIST_FILE`](https://cmake.org/cmake/help/v3.2/variable/CMAKE_CURRENT_LIST_FILE.html)to allow the resultant "ProjectConfig.cmake" file(s)
 to be completely relocatable.
 
-This can become more complicated with Projects that depend on others.
+Creating and managing these files can become more complicated with Projects that depend on others.
 Generally, this can be handled with
 
-- Consistent use of imported targets
-- Minimizing public link dependencies
-- "ProjectConfig.cmake" files should call `find_package` for any compile
-or link time dependencies.
-  - The standard CMake command line/environment variables such as [`CMAKE_PREFIX_PATH`](http://www.cmake.org/cmake/help/v3.2/variable/CMAKE_PREFIX_PATH.html) should used to point CMake to the right search prefixes
-  - That can be handled by the configuration management or build wrapper
-    systems (e.g. spack's env setup, Homebrew's sh/superenv or Nix environments for example).
+- Consistent use of imported targets to avoid hard-coding paths to dependent libraries/headers
+- Minimizing public link dependencies, as these must be refound, even if the client does not use the dependency directly
+- "ProjectConfig.cmake" files should call `find_package` for any compile or link time dependencies. This
+  refinds any dependencies and hence creates the required imported targets. How the dependencies are located
+  by `find_package` should be left to the configuration management system, which can point CMake to
+  the right locations using the standard CMake command line/environment variables such as [`CMAKE_PREFIX_PATH`](http://www.cmake.org/cmake/help/v3.2/variable/CMAKE_PREFIX_PATH.html)
+  - This also works for build wrapper systems (e.g. spack's env setup, Homebrew's sh/superenv or Nix environments for example).
 
 However, this is not necessarily a complete solution.
 
@@ -345,8 +349,8 @@ Pkg-Config
 ---------
 Scripts for the [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config/)
 tool can also be made relocatable by using the builtin `pcfiledir` variable.
-This expands to the directory holding the `.pc` file, and so for our
-example project Foo could be written as
+This expands to the directory holding the `.pc` file, and so for an
+example project Foo this could be written as
 
 ```
 prefix=${pcfiledir}/../..
@@ -364,32 +368,36 @@ be created from expansion variables set by the buildsystem of Foo.
 
 Pkg-config can also handled dependencies, and the `PKG_CONFIG_PATH` (and possibly `PKG_CONFIG_LIBDIR`)
 environment variable should be used to correctly resolves paths to these.
-As with CMake, this could be handled by the configuration management or
+As with CMake, this should be handled by the configuration management or
 build wrapper.
 
-Other tools?
-------------
-?
+Other tools
+-----------
+**TODO**: Autotools (probably via `pkg-config`), SCons, Python, etc?
 
-Linked Relocatability
-=====================
+
+Relocatability with External Dependencies
+=========================================
+
 What happens to relocatability when we have two packages with a dependency?
 For example `Foo` and `Bar`, with `Foo` linking to `libbar` from `Bar`.
 
-1. Can move `Foo` if its `RPATH` contains absolute path to `libbar`.
-2. Cannot move `Bar` without updating `Foo`'s RPATH or using dynamic
-   loader paths
-3. Can package and deploy both `Foo` and `Bar` provided relative RPATHs
-   are used and both stay in the same relative location to each other.
 
-Also consider case of text/resource file dependency.
+1. Can move `Foo` if its `RPATH` contains absolute path to `libbar`.
+2. Cannot move `Bar` without updating `Foo`'s RPATH or using/updating dynamic
+   loader paths
+3. Can move both `Foo` and `Bar` provided relative RPATHs
+   are used and both stay in the same locations relative to each other.
+
+**TODO**: Cases for text/resource file dependencies?
 
 
 
 Patching Upstream Software
 ==========================
 The preceeding sections cover cases where "we" are developing the
-software, or are in a position to easily patch it. Typical HEP software
+software, or have identified relocatability issues and are in a
+position to patch these. Typical HEP software
 stacks will use a large number of packages not directly maintained by
 the experiment/community using them, and not all of them may meet the
 criteria for full relocatability. How to handle these?
@@ -409,25 +417,30 @@ additional arguments.
 
 For libraries using environment variables, it may be possible to wrap
 these with a small facade library. This would do nothing more that
-self-locate and set the needed environment variables. However, this
-has implications for usability and runtime manipulation of the environment
-by clients.
+self-locate, set the needed environment variables and expose the rest
+of the library symbols. However, this has implications for usability 
+and runtime manipulation of the environment by clients.
 
 When absolute paths are hardcoded into binaries, then only intrusive
 patching is likely to work. For simple cases, application of the
 techniques discussed earlier may be able to provide a fully relocatable
 solution. At worst, hard coded paths could be replaced with environment
-variable lookup! In more complex cases, it may be possible to patch the
-binary directly at install time (TODO: tools for this?) to
+variable lookup and wrapper scripts. In more complex cases, it may be possible to patch the
+binary directly at install time (**TODO**: tools for this?) to
 rewrite hardcoded paths. Note that this still results in hard coded
-paths, so can only reallybe handled by a package manager system and would
+paths, so can only really be handled by a package manager system and would
 not work for deploying software over network file systems where final
-mount points are not guaranteed.
+mount points are not guaranteed to be identical.
 
 Library RPATHs
 --------------
-1. If only RPATHs or text files are involved, these should(?) be handled by the packaging system/tools (`patchelf`, `otool`, `install_name_tool` etc)
-an one derived at runtime.
-3. Runtime/chroot based tools like [PRoot](https://github.com/proot-me/PRoot/blob/master/doc/proot/manual.txt)?
+1. RPATHs can be changed at install time by the packaging system/tools (`patchelf`, `otool`, `install_name_tool` etc)
+2. Runtime/chroot based tools like [PRoot](https://github.com/proot-me/PRoot/blob/master/doc/proot/manual.txt) may
+also be useful.
+
+Conclusions
+===========
+**TODO**
+
 
 
