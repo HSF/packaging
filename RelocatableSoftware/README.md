@@ -112,8 +112,8 @@ compatibility are helpful for simplifying binary packaging and deployment.
     - Ensures software can be used by as wide a range of upstream clients as possible
     - Nevertheless, can be tricky for [languages like C++](https://community.kde.org/Policies/Binary_Compatibility_Issues_With_C%2B%2B)
     - There [are tools to help check compatibility](https://fedoraproject.org/wiki/How_to_check_for_ABI_changes_in_a_package) at least for ELF, but needs a more thorough survey.
-  - Program for multiple versions of any dependencies (assumes they have good API/ABI versioning!!)
-    - Dependecies should provide a versioning header [as per HSF (draft) guidelines](https://github.com/HEP-SF/documents/blob/master/HSF-TN/draft-2016-PROJ/draft-HSF-TN-2016-PROJ.md)
+  - Program for compatibility with multiple versions of any dependencies
+    - Dependencies should provide a versioning header [as per HSF (draft) guidelines](https://github.com/HEP-SF/documents/blob/master/HSF-TN/draft-2016-PROJ/draft-HSF-TN-2016-PROJ.md)
   - Hide dependencies as implementation details as far as possible.
   - Consider versioned symbols and/or inlined namespaces?
 - Building binaries
@@ -264,6 +264,49 @@ hard-coding or use of standard environment variables. On UNIX, these could inclu
 - `/var`
 - `/tmp` or `TMPDIR`
 
+(Re)Locating the Interpreter for Programs
+=========================================
+Programs implemented using intepreted languages such as Python are usually written as scripts using (on Unix platforms)
+a ["shebang"](https://en.wikipedia.org/wiki/Shebang_(Unix)) on the first line to define the interpreter program to pass the remainder of the script to. For example, a Python "hello world" program might be written as
+
+```Python
+#!/usr/bin/python
+
+print("hello world")
+```
+
+This hard codes the system interpreter into the program and whilst this program is relocatable (assuming a valid system
+Python install), it cannot be used with any other interpreter. Typical HEP software stacks install, and require use of,
+their own interpreters, whose paths may also end up hard coded into scripts:
+
+```Python
+#!/custom/stack/root/python/2.7/bin/python
+
+print("hello world")
+```
+
+The resulting stack is then not relocatable as the interpreter path will not exist after relocation. 
+
+Rather than hard coding system or custom interpreter paths, script authors should prefer the use of the
+[`env`](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/env.html) program as the shebang, e.g.
+
+```Python
+#!/usr/bin/env python
+
+print("hello world")
+```
+
+Use of `env` makes the program relocatble, but defers location of the interpreter to the `PATH` environment variable,
+and consequently the configuration management system for the software stack. Whilst package authors should prefer
+usage of the `env` pattern, software stack managers can also consider rewriting the shebang line during install 
+and on any relocation to the absolute path of the required interpreter. As it is plain text, simple regular expression
+replacement can be used, but the chosen packaging system must support this, and care must be taken
+if the resultant stack is to be deployed over network file systems (and hence unknown mount points).
+
+**TODO?** Binaries *also* have an interpreter (on Linux, `ld-linux.so`, On macOS, `dyld`). These are also hardcoded, 
+though can be changed with, e.g., `patchelf` for ELF binaries.
+
+
 (Re)Locating Dynamic Libraries
 ==============================
 A non-trivial package will usually be partioned into a main
@@ -315,8 +358,15 @@ dependencies. At install time, rpaths are usually stripped, unless
 configured otherwise.
 
 
-Scripting/Development Support Tools
-===================================
+(Re)Locating Language Modules
+=============================
+**TODO** How to handle module lookup, e.g. `PYTHONPATH` for Python (other languages?). Things that package authors can do.
+Things that the packaging system should do (inc. any packaging system provided by the language, e.g. `pip`, `virtualenv`).
+Things best left to configuration management.
+
+
+Development Tools
+=================
 CMake
 -----
 To support use of a Project by a CMake based client project, scripts for
@@ -382,7 +432,6 @@ Relocatability with External Dependencies
 What happens to relocatability when we have two packages with a dependency?
 For example `Foo` and `Bar`, with `Foo` linking to `libbar` from `Bar`.
 
-
 1. Can move `Foo` if its `RPATH` contains absolute path to `libbar`.
 2. Cannot move `Bar` without updating `Foo`'s RPATH or using/updating dynamic
    loader paths
@@ -431,6 +480,11 @@ rewrite hardcoded paths. Note that this still results in hard coded
 paths, so can only really be handled by a package manager system and would
 not work for deploying software over network file systems where final
 mount points are not guaranteed to be identical.
+
+Interpreter Paths
+-----------------
+Shebangs are plain text, so are straightforward to patch directly using regular expression
+find/replace directly, or via tooling at build or install time.
 
 Library RPATHs
 --------------
