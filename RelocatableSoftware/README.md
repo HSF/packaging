@@ -492,6 +492,47 @@ Library RPATHs
 2. Runtime/chroot based tools like [PRoot](https://github.com/proot-me/PRoot/blob/master/doc/proot/manual.txt) may
 also be useful.
 
+
+Relocation and Packaging
+========================
+**TODO** Topics involving relocatability when it comes to the packaging level. Define "packaging" as the things we need
+to do/write to allow `spack|brew|whatever install mypackage` to work, whether building `mypackage` from source locally
+or downloading and unpacking a binary. The "package manager" needs to include tooling to manage relocation, and this 
+may include things like changing RPATHs in binaries, to shebangs in interpreted programs. Other topics like deployment 
+to CVMFS etc.
+
+Take simple example of two packages and a "typical" versioned tree plus "views"? e.g.
+
+```
++- whateverroot/
+   +- packages/
+   |   +- Foo/
+   |   |  +- 1.0/
+   |   |  |   +- bin/
+   |   |  |   +- lib/
+   |   |  |   +- ...
+   |   |  +- 2.0/
+   |   |     +- ...
+   |   +- Bar/
+   |      +- 1.0-usingFoo1.0/
+   |      |  +- bin/
+   |      |  +- lib/
+   |      +- 1.0-usingFoo2.0/
+   |         +- bin/
+   |         +- lib/
+   +- views/
+      +- release-1.0/
+      |  +- bin/
+      |  +- lib/
+      +- release-2.0/
+         +- bin/
+         +- lib/
+```
+
+Assume Foo/Bar are relocatable according to earlier topics, how should package manager deal with pointing Bar to its
+needed Foo, and how do views work in this case?
+
+
 Conclusions
 ===========
 **TODO**
