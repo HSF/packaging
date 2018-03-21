@@ -9,7 +9,7 @@ set(MANGLE_BINRELOC "hsf_reloc_binreloc${MANGLE_BINRELOC}")
 configure_file(binreloc/hsf_binreloc.h.in binreloc/hsf_binreloc.h @ONLY)
 
 # - Configure "front end" to binreloc, adding known *relative path*
-# from exe dire to resource dir
+# from exe dir to resource dir
 file(RELATIVE_PATH HSF_BINDIR_TO_RESOURCEDIR
   "${CMAKE_INSTALL_FULL_BINDIR}"
   "${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}/resources"
@@ -43,7 +43,7 @@ else()
 endif()
 
 #-----------------------------------------------------------------------
-# - Optional Qt5 deom for its builtin self-location
+# - Optional Qt5 demo for its builtin self-location
 # - Only need core lib
 find_package(Qt5Core QUIET)
 

@@ -285,7 +285,7 @@ their own interpreters, whose paths may also end up hard coded into scripts:
 print("hello world")
 ```
 
-The resulting stack is then not relocatable as the interpreter path will not exist after relocation. 
+The resulting stack is then not relocatable as the interpreter path will not exist after relocation.
 
 Rather than hard coding system or custom interpreter paths, script authors should prefer the use of the
 [`env`](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/env.html) program as the shebang, e.g.
@@ -298,12 +298,12 @@ print("hello world")
 
 Use of `env` makes the program relocatble, but defers location of the interpreter to the `PATH` environment variable,
 and consequently the configuration management system for the software stack. Whilst package authors should prefer
-usage of the `env` pattern, software stack managers can also consider rewriting the shebang line during install 
+usage of the `env` pattern, software stack managers can also consider rewriting the shebang line during install
 and on any relocation to the absolute path of the required interpreter. As it is plain text, simple regular expression
 replacement can be used, but the chosen packaging system must support this, and care must be taken
 if the resultant stack is to be deployed over network file systems (and hence unknown mount points).
 
-**TODO?** Binaries *also* have an interpreter (on Linux, `ld-linux.so`, On macOS, `dyld`). These are also hardcoded, 
+**TODO?** Binaries *also* have an interpreter (on Linux, `ld-linux.so`, On macOS, `dyld`). These are also hardcoded,
 though can be changed with, e.g., `patchelf` for ELF binaries.
 
 
@@ -370,7 +370,7 @@ Development Tools
 CMake
 -----
 To support use of a Project by a CMake based client project, scripts for
-use with CMake's [`find_package`](http://www.cmake.org/cmake/help/v3.2/command/find_package.html) command in "config" 
+use with CMake's [`find_package`](http://www.cmake.org/cmake/help/v3.2/command/find_package.html) command in "config"
 mode should be provided. A `FindPACKAGENAME.cmake` should *not* be implemented, including the use of CMake commands
 like `find_path`, `find_library` as these are intended to locate packages not supplying any CMake support files. CMake
 "ProjectConfig.cmake" files are installed alongside the project and can self-locate the project's headers/libraries/executables
@@ -467,7 +467,7 @@ additional arguments.
 For libraries using environment variables, it may be possible to wrap
 these with a small facade library. This would do nothing more that
 self-locate, set the needed environment variables and expose the rest
-of the library symbols. However, this has implications for usability 
+of the library symbols. However, this has implications for usability
 and runtime manipulation of the environment by clients.
 
 When absolute paths are hardcoded into binaries, then only intrusive
@@ -497,8 +497,8 @@ Relocation and Packaging
 ========================
 **TODO** Topics involving relocatability when it comes to the packaging level. Define "packaging" as the things we need
 to do/write to allow `spack|brew|whatever install mypackage` to work, whether building `mypackage` from source locally
-or downloading and unpacking a binary. The "package manager" needs to include tooling to manage relocation, and this 
-may include things like changing RPATHs in binaries, to shebangs in interpreted programs. Other topics like deployment 
+or downloading and unpacking a binary. The "package manager" needs to include tooling to manage relocation, and this
+may include things like changing RPATHs in binaries, to shebangs in interpreted programs. Other topics like deployment
 to CVMFS etc.
 
 Take simple example of two packages and a "typical" versioned tree plus "views"? e.g.
