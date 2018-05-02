@@ -1,26 +1,19 @@
-# Packaging
+# HSF Packaging Working Group
 
-Umbrella project to keep track of building / packaging related action items and eventually implementation.
+This is an umbrella project to keep track of building / packaging related action items and eventually implementations
+for the [HSF Packaging Working Group](http://hepsoftwarefoundation.org/activities/packaging.html)
 
-## RFC
+# Umbrella Projects
+## [Documents](documents)
+A holdall for WG tech notes, documents, plus comments and links that don't yet fit elsewhere.
 
-I think we agree that there are three separate "concerns" which we should take care of:
+## [Package Manager Test Drives](testdrives)
+This project provides "test drives" of identified package management and deployment tools to demonstrate how
+they can be used to install a basic HEP software stack.
 
-- Source management:
-  - Should include a way to keep track of vanilla sources as well as experiment specific patches (when required), as they are used by the build systems. Do we all agree on this (+Giulio)?
-  - My (Giulio's) modest proposal is to mimick what we do in CMS where we keep a (full or partial) mirror of any externals we use as a Git(Hub) repository per external and for a given `<commit-hash-or-tag>` which is customized we get a `<owner>/<commit-hash-or-tag>` branch which contains the `<owner>` specific patches. The net result of this is:
-    - We have a nice web view for both vanilla and patched sources.
-    - We keep track of changes (and changes history).
-    - We can compare different versions, including a nice web view to do so.
-    - Sources being used are uniquely identified by a commit ID.
-    - In case of Github mirrors, contributing back is as trivial as PR.
-    - In case of non Github mirrors, single patches to feed back are as easy a a URL.
-    - Mirror size increase as patches do, not as full version.
+# Contributing
+Questions and comments on any of the projects are welcome, simply [raise an issue](https://github.com/HSF/packaging/issues). 
+If you want to actively contribute to the working group, please contact us through our [HSF Page](http://hepsoftwarefoundation.org/activities/packaging.html).
 
-- Build recipes:
-  - IMHO (Giulio's), these should be as independent as possible from packaging and dependencies, so that they can be used "plug and play"  with more than one packaging system (e.g. LCG, CMS, homebrew ones). Doing so would simplify transition so that we can reuse recipes but still keep our own build infrastructure.
-  - IMHO (Giulio's), it should be a clear mandate of the HSF to put effort in version / platform / compiler ports, given that's where 90% of the effort in the end goes.
+Pull requests to fix issues in, or add functionality to, existing projects or to propose new projects are also welcome.
 
-- Configuration management (i.e. dependencies), packaging and distribution.
-  - Do we want a unique configuration and packaging tool?
-      - IMHO, (Giulio's), for the short term it is impossible, in particular due to fact that these things are very correlated the build infrastructure, distribution infrastructure and even platform. E.g., if I'm on a mac I want to use homebrew, not install a separate system.
