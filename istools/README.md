@@ -1,12 +1,17 @@
 # Instruction Set Tools
 
-This project was inspired by discussion in [Packaging WG Meeting]().
+This project was inspired by discussion in [Packaging WG Meeting](https://indico.cern.ch/event/719557/).
 It is intended as a collation of information and example code for
 building and packaging code that uses specific instruction sets but
 may run on (older) systems that do not support these on their CPUs.
-Whilst this can, as discussed in ..., be handled by the package/configuration manager,
-there may also be places where the software itself can be written
-to handle this.
+Whilst this can, as discussed in [the presentation](https://indico.cern.ch/event/719557/contributions/2965980/attachments/1642767/2624258/HSF-Packaging-20180502.pdf), be handled by the package/configuration manager,
+there may also be places where HEP software itself can be written
+to handle this automatically or selectively.
+
+This doesn't handle the case of things like auto-vectorization, or
+third-party packages that set handle instructions sets in their
+own way. We also look at ways to discover available instruction sets
+at runtime to construct the platform tags as [described on slide 6](https://indico.cern.ch/event/719557/contributions/2965980/attachments/1642767/2624258/HSF-Packaging-20180502.pdf).
 
 # Useful Links
 ## General
