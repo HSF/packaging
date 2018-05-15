@@ -7,7 +7,7 @@ for the [HSF Packaging Working Group](http://hepsoftwarefoundation.org/activitie
 ## [Documents](documents)
 A holdall for WG tech notes, documents, plus comments and links that don't yet fit elsewhere.
 
-## [Package Manager Test Drives](testdrives)
+## [Package Manager Test Drives](testdrive)
 This project provides "test drives" of identified package management and deployment tools to demonstrate how
 they can be used to install a basic HEP software stack.
 
