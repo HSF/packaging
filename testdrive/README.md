@@ -67,5 +67,6 @@ To keep things simple some simplifying assumptions are made:
 
 1. Create a new subdirectory under this one named for the package manager you are adding.
 2. Copy the [README template](TestDriveREADMETemplate.md) into the new directory and fill in the details
-   noted by the _**Authors**_ _: add details here..._ comments.
+   noted by the _**Authors**_ _: add details here..._ comments. Add any additional material required such as Dockerfiles.
+3. Submit a Pull Request!
 
