@@ -1,0 +1,36 @@
+aliBuild
+===
+
+aliBuild homepage at http://alisw.github.io/alibuild/
+
+cc7-nix-alibuild
+---
+
+**DISCLAIMER**: this is not ALICE production way of doing things, nor a battle
+tested setup. It's only purpose is to serve as demonstrator of various possible
+techniques and to stress a few design points I think are important.
+
+This is a docker container, based on Graeme cc7-nix, which has three goals:
+
+- Allow people to play with aliBuild.
+- Show how you do a nix overlay to customise the official nix distribution to
+  your needs (e.g. picking up a newer version of CMake).
+- Show how aliBuild can be integrated with other packaging systems, so that we
+  can have the best of multiple worlds: a battle stressed, mainstream, or simply
+  third party package manager for the system configuration, an HEP / ALICE specific
+  tool for the stuff we really care about. Cooperation over conquest! ;-)
+
+Once someone with rights uploads it, you will be able to play with it via:
+
+    docker run -it hepsoftwarefoundation/cc7-nix-alibuild
+    # Open a new shell with the O2 system requirements available
+    nix-shell -p alice.o2BuildEnv
+    # Check the environment. Everything should be green in this setup
+    alibuild/aliDoctor O2 --defaults o2 --architecture slc7_x86-64
+    # Attempt at building O2. Notice it will not build Python and other system
+    # stuff but it will build ROOT, GEANT4 and fastjet (even if they exists in
+    # Nix) since we consider them as critical and do not allow system packages.
+    alibuild/aliBuild build O2 --defaults o2 --architecture slc7_x86-64
+
+Notice the architecture is not required in general, but again I did not have time
+to debug the container provided by Graeme.
