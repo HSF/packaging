@@ -1,0 +1,6 @@
+# needed by sci-physics/root
+sys-libs/zlib minizip
+dev-libs/libpcre2 pcre16
+
+sci-physics/root X asimage davix gdml gsl math minuit pythia6 pythia8 python
+sci-physics/root roofit root7 ssl tbb threads tiff tmva unuran vc xml xrootd

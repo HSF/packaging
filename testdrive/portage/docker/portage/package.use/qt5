@@ -1,0 +1,3 @@
+# needed by Qt5
+x11-libs/libxcb xkb
+x11-libs/libxkbcommon X
