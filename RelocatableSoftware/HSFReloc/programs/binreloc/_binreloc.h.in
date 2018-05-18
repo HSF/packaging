@@ -45,9 +45,13 @@ typedef enum {
 #define br_dirname          @MANGLE_BINRELOC@_br_dirname
 #endif
 
+/* Initialization */
 int   br_init         (BrInitError *error);
 int   br_init_lib     (BrInitError *error);
 
+/* Paths to binary this code was compiled into
+ * and directory containing it
+*/
 char *br_find_exe     (const char *default_exe);
 char *br_find_exe_dir (const char *default_dir);
 

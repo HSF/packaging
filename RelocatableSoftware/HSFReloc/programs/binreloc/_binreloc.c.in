@@ -9,8 +9,7 @@
  * http://www.boost.org/LICENSE_1_0.txt
  *
 */
-#ifndef __BINRELOC_C__
-#define __BINRELOC_C__
+#include "@BR_NAME@.h"
 
 #ifdef ENABLE_BINRELOC
 	#include <sys/types.h>
@@ -25,7 +24,6 @@
 #include <sys/param.h>
 #include <mach-o/dyld.h>
 #endif
-#include "hsf_binreloc.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -498,4 +496,3 @@ br_dirname (const char *path)
 }
 #endif /* __cplusplus */
 
-#endif /* __BINRELOC_C__ */
