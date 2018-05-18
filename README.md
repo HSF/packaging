@@ -15,6 +15,13 @@ they can be used to install a basic HEP software stack.
 This project provides some notes and example C/C++ code for packaging software
 that uses/requires specific CPU instruction sets such as SSE, AVX.
 
+## [Relocatable Software](RelocatableSoftware)
+This project provides some notes and example code for developing
+packages that are _relocatable_. That is, the collection of installed
+files can be moved from their installed location to anywhere else on
+the system and still function without any system or user configuration
+changes.
+
 # Contributing
 Questions and comments on any of the projects are welcome, simply [raise an issue](https://github.com/HSF/packaging/issues).
 If you want to actively contribute to the working group, please contact us through our [HSF Page](http://hepsoftwarefoundation.org/activities/packaging.html).
