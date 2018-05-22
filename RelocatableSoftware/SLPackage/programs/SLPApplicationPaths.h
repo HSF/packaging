@@ -1,13 +1,13 @@
-/** \file HSFApplicationPath.h
+/** \file SLPApplicationPaths.h
  *  \brief C++ interface to binreloc and resource paths
 */
 
-#ifndef HSFRELOC_HH
-#define HSFRELOC_HH
+#ifndef SLPAPPLICATIONPATHS_HH
+#define SLPAPPLICATIONPATHS_HH
 
 #include <string>
 
-namespace HSFReloc {
+namespace SLP {
 //! Return path to running executable
 const std::string& getApplicationDir();
 

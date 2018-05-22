@@ -12,18 +12,18 @@ include(binreloc/GenerateBinreloc.cmake)
 
 # - Configure "front end" to binreloc, adding known *relative path*
 # from exe dir to resource dir
-file(RELATIVE_PATH HSF_BINDIR_TO_RESOURCEDIR
+file(RELATIVE_PATH SLP_BINDIR_TO_RESOURCEDIR
   "${CMAKE_INSTALL_FULL_BINDIR}"
   "${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}/resources"
   )
-configure_file(HSFApplicationPaths.cpp.in HSFApplicationPaths.cpp @ONLY)
+configure_file(SLPApplicationPaths.cpp.in SLPApplicationPaths.cpp @ONLY)
 
-add_executable(hsfreloc
-  HSFApplicationPaths.h
-  ${CMAKE_CURRENT_BINARY_DIR}/HSFApplicationPaths.cpp
-  hsfreloc.cpp
+add_executable(slp-binreloc
+  SLPApplicationPaths.h
+  ${CMAKE_CURRENT_BINARY_DIR}/SLPApplicationPaths.cpp
+  slp-binreloc.cpp
   )
-target_include_directories(hsfreloc PRIVATE
+target_include_directories(slp-binreloc PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
   )
@@ -31,8 +31,8 @@ target_include_directories(hsfreloc PRIVATE
 # Generate and link binreloc code for this exe.
 # It's always a private link because binreloc is only
 # ever an implementation detail of clients.
-generate_binreloc(hsf)
-target_link_libraries(hsfreloc PRIVATE hsf_binreloc)
+generate_binreloc(SLPackage)
+target_link_libraries(slp-binreloc PRIVATE SLPackage_binreloc)
 
 #-----------------------------------------------------------------------
 # - Optional Poco demo for its builtin self location
@@ -40,10 +40,10 @@ target_link_libraries(hsfreloc PRIVATE hsf_binreloc)
 find_package(Poco QUIET COMPONENTS Util)
 
 if(NOT Poco_FOUND)
-  message(STATUS "Poco not found, disabling build of hsfreloc-poco")
+  message(STATUS "Poco not found, disabling build of slp-poco")
 else()
-  add_executable(hsfreloc-poco hsfreloc-poco.cpp)
-  target_link_libraries(hsfreloc-poco Poco::Util)
+  add_executable(slp-poco slp-poco.cpp)
+  target_link_libraries(slp-poco Poco::Util)
 endif()
 
 #-----------------------------------------------------------------------
@@ -52,9 +52,9 @@ endif()
 find_package(Qt5Core QUIET)
 
 if(NOT Qt5Core_FOUND)
-  message(STATUS "Qt5Core not found, disabling build of hsfreloc-qt")
+  message(STATUS "Qt5Core not found, disabling build of slp-qt")
 else()
-  add_executable(hsfreloc-qt hsfreloc-qt.cpp)
-  target_link_libraries(hsfreloc-qt Qt5::Core)
+  add_executable(slp-qt slp-qt.cpp)
+  target_link_libraries(slp-qt Qt5::Core)
 endif()
 

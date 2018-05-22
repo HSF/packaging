@@ -1,4 +1,4 @@
-Relocatable
+SLPackage
 ===========
 Example program/library code to demonstrate package relocatability concepts.
 The following software is required to build the base set of programs:
@@ -9,8 +9,8 @@ The following software is required to build the base set of programs:
 
 The following software is optional:
 
-- [Qt5](https://www.qt.io) for the [qt](programs/hsfreloc-qt.cpp) example application
-- [Poco](http://pocoproject.org) for the [poco](hsfreloc-poco.cpp) example application
+- [Qt5](https://www.qt.io) for the [qt](programs/slp_program-qt.cpp) example application
+- [Poco](http://pocoproject.org) for the [poco](slp_program-poco.cpp) example application
 
 To build the software, simply create a build directory and run `cmake` inside it,
 pointing it to the top level source directory (i.e. the directory holding this
@@ -18,7 +18,7 @@ README):
 
 ```console
 $ ls
-CMakeLists.txt README.md      hsfreloc       programs       scripting
+CMakeLists.txt README.md      slp_program       programs       scripting
 $ mkdir build
 $ cd build
 $ cmake ..
@@ -45,7 +45,7 @@ Compiled Languages
 The [programs](programs) directory focuses on C/C++ implementations, but PRs are
 welcome to demonstrate application/library self-location in other languages.
 
-The `hsfreloc` program
+The `slp_program` program
 ----------------------
 
 This basic C/C++ example demonstrates the use of the [`binreloc`](programs/binreloc)
@@ -54,26 +54,26 @@ file "resource.txt" to show how these can be located. Simply running the applica
 will print its location and the contents of the resource file:
 
 ``` console
-$ ./BuildProducts/bin/hsfreloc
+$ ./BuildProducts/bin/slp_program
 [application in]: /AbsPathToWhereYouRanCMake/./BuildProducts/bin
-[resource]: 'hello from builtin hsfreloc resource file!
+[resource]: 'hello from builtin slp_program resource file!
 '
 $
 ```
 
 Relocatability can be tested by copying the `BuildProducts` directory to any other location
-you like on the local machine. Rerun `hsfreloc` and it should print its new location and
+you like on the local machine. Rerun `slp_program` and it should print its new location and
 the resource contents. You can prove that it's not using build time paths by removing
 the original build directory.
 
 
-The `hsfreloc-poco` program
+The `slp_program-poco` program
 ---------------------------
 
 Demonstrates the self-location interfaces supplied by the [Poco](http://pocoproject.org) libraries.
 
 
-The `hsfreloc-qt` program
+The `slp_program-qt` program
 -------------------------
 
 Demonstrates the self-location interfaces supplied by the [Qt5](https://www.qt.io) libraries.
@@ -128,9 +128,9 @@ and uses a `resource.txt` file:
 ```
 +- <PREFIX>
    +- bin/
-   |  +- hsfreloc
+   |  +- slp_program
    +- share/
-      +- hsfreloc/
+      +- slp_program/
          +- resource.txt
 ```
 
@@ -138,7 +138,7 @@ A typical solution to locating `resource.txt` at runtime would be to use an
 environment variable and query this in the program, e.g. in C/C++:
 
 ```C++
-const char* resourcePath = getenv("HSFRELOC_RESOURCE_PATH");
+const char* resourcePath = getenv("SLPACKAGE_RESOURCE_PATH");
 ```
 
 Whilst this does enable relocatability, it relies on the user setting this
@@ -243,7 +243,7 @@ Though links can be followed to some extent, hardlinks in particular cannot
 easily be resolved. Rather, most self-location relies on querying the
 *process* itself.
 
-Some basic techniques, but also APIs, are demonstrated in the [`HSFReloc`](HSFReloc`) example project, including
+Some basic techniques, but also APIs, are demonstrated in the [`SLPackage`](SLPackage`) example project, including
 
 - [binreloc](https://github.com/drbenmorgan/Resourceful) at low level for C/C++
 - C++ Application objects in frameworks such as:

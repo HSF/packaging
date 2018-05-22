@@ -1,6 +1,6 @@
-#include "HSFApplicationPaths.h"
+#include "SLPApplicationPaths.h"
 
-#include "hsf_binreloc.h"
+#include "SLPackage_binreloc.h"
 #include <cstdlib>
 
 namespace {
@@ -16,7 +16,7 @@ int initBinreloc() {
 }
 }
 
-namespace HSFReloc {
+namespace SLP {
 const std::string& getApplicationDir() {
   static std::string appDir;
   if (appDir.empty()) {
@@ -29,7 +29,7 @@ const std::string& getApplicationDir() {
 }
 
 const std::string& getResourceDir() {
-  static std::string binToResPath("@HSF_BINDIR_TO_RESOURCEDIR@");
+  static std::string binToResPath("@SLP_BINDIR_TO_RESOURCEDIR@");
   static std::string resourceDir;
   if (resourceDir.empty()) {
     resourceDir = getApplicationDir() + "/" + binToResPath;

@@ -22,68 +22,68 @@ from others in use or under consideration.
 
 What is Relocatability?
 =======================
-Say we have installed a package `HSFReloc` that comprises a program, library, plugins, and
+Say we have installed a package `SLPackage` that comprises a program, library, plugins, and
 resource files:
 
 ```
 /home/
  +- user/
     +- Projects/
-       +- HSFReloc/
+       +- SLPackage/
           +- bin/
-          |  +- hsfreloc >------------------- >---
-          +- include/                       |    |
-          |  +- hsfreloc.h                  |    |
-          +- lib/                           |    |
-          |  +- libhsfreloc.so <---- links to    |
-          |  +- plugins/     |                   |
-          |  |  +- a.so    <-|                   |
-          |  |  +- b.so    <-| loads             |
-          |  +- cmake/                           |
-          |  |  +- HSFReloc/                     |
-          |  |     +- HSFRelocConfig.cmake       |
-          |  +- pkgconfig/                       |
-          |     +- HSFReloc.pc                   |
-          +- share/                              |
-             +- HSFReloc/                        |
-                +- resource.txt <----------- reads
+          |  +- slp_program >------------------- >---
+          +- include/                          |    |
+          |  +- slp.h                          |    |
+          +- lib/                              |    |
+          |  +- libslp.so <----------- links to     |
+          |  +- plugins/     |                      |
+          |  |  +- a.so    <-|                      |
+          |  |  +- b.so    <-| loads                |
+          |  +- cmake/                              |
+          |  |  +- SLPackage/                       |
+          |  |     +- SLPackageConfig.cmake         |
+          |  +- pkgconfig/                          |
+          |     +- SLPackage.pc                     |
+          +- share/                                 |
+             +- SLPackage/                          |
+                +- resource.txt <-------------- reads
 ```
 
-If `HSFReloc` is relocatable, then we can move its contents across the filesystem, e.g.:
+If `SLPackage` is relocatable, then we can move its contents across the filesystem, e.g.:
 
 ```
-$ mv /home/user/Projects/HSFReloc /home/user/Another/Workspace
+$ mv /home/user/Projects/SLPackage /home/user/Another/Workspace
 ...
 
 /home/
  +- user/
     +- Another/
        +- Workspace/
-          +- HSFreloc/
+          +- SLPackage/
              +- bin/
-             |  +- hsfreloc
+             |  +- slp_program
              +- include/
-             |  +- hsfreloc.h
+             |  +- slp.h
              +- lib/
-             |  +- libhsfreloc.so
+             |  +- libslp.so
              |  +- plugins/
              |  |  +- a.so
              |  |  +- b.so
              |  +- cmake/
-             |  |  +- HSFReloc/
-             |  |     +- HSFRelocConfig.cmake
+             |  |  +- SLPackage/
+             |  |     +- SLPackageConfig.cmake
              |  +- pkgconfig/
-             |     +- HSFReloc.pc
+             |     +- SLPackage.pc
              +- share/
-                +- HSFReloc/
+                +- SLPackage/
                    +- resource.txt
 ```
 
-and the user would be able to run `hsfreloc` or link to `libhsfreloc` without making *any* changes
-either to the files comprising `HSFReloc` or the runtime environment (`PATH`
-might be edited for convenience, but `hsfreloc` would still be runnable via a fully
+and the user would be able to run `slp_program` or link to `libslp` without making *any* changes
+either to the files comprising `SLPackage` or the runtime environment (`PATH`
+might be edited for convenience, but `slp_program` would still be runnable via a fully
 qualified path). _Note that the relocation keeps the files comprising
-`HSFreloc` in the same locations relative to each other_.
+`SLPackage` in the same locations relative to each other_.
 [OS X Application and Framework Bundles/Packages](https://developer.apple.com/library/mac/documentation/CoreFoundation/Conceptual/CFBundles/Introduction/Introduction.html#//apple_ref/doc/uid/10000123i)
 are the classic example of relocatable programs and libraries respectively, and
 the term 'Portable Binary' is often used on Linux.
@@ -91,16 +91,16 @@ the term 'Portable Binary' is often used on Linux.
 Though basic, this example illustrates three of the core issues of relocatability and
 the corresponding technical aspects:
 
-- **How does `hsfreloc` locate its dynamic library `libhsfreloc.so` dependency at runtime?**
+- **How does `slp_program` locate its dynamic library `libslp.so` dependency at runtime?**
   - _Link/Run time lookup of dynamic libraries_
-- **How does `hsfreloc` locate its `resource.txt` file, or `libhsfreloc` its plugins at runtime?**
-  - [_Binary self-location on the filesystem at runtime_](HSFReloc)
-- **How do `HSFReloc`'s CMake, pkg-config, and other support files find `HSFReloc`'s library and headers
+- **How does `slp_program` locate its `resource.txt` file, or `libslp` its plugins at runtime?**
+  - [_Binaries able to self-locate themselves on the filesystem at runtime_](SLPackage)
+- **How do `SLPackage`'s CMake, pkg-config, and other support files find `SLPackage`'s library and headers
   when used by a client?**
   - [_Script self-location on the filesystem at runtime_](DevTools)
 
-A further item to be considered is what happens if `HSFReloc` uses files
-from another package (e.g. `hsfreloc` or `libhsfreloc` links to a "`libbar`").
+A further item to be considered is what happens if `SLPackage` uses files
+from another package (e.g. `slp_program` or `libslp` links to a "`libbar`").
 This is deferred to a later section.
 
 Whilst the example only illustrates moving a package across a local

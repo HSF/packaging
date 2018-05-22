@@ -1,5 +1,5 @@
 /**
-  \file hsf-reloc-binreloc.cpp
+  \file slpackage.cpp
   \brief Relocatable binreloc application
 */
 
@@ -7,13 +7,13 @@
 #include <fstream>
 #include <streambuf>
 
-#include "HSFApplicationPaths.h"
+#include "SLPApplicationPaths.h"
 
 int main(int argc, char *argv[]) {
-  auto appDir = HSFReloc::getApplicationDir();
+  auto appDir = SLP::getApplicationDir();
   std::cout << "[application in]: " << appDir << "\n";
 
-  auto resPath = HSFReloc::getResourceDir() + "/" + "resource.txt";
+  auto resPath = SLP::getResourceDir() + "/" + "resource.txt";
 
   std::ifstream resStream {resPath};
   if (resStream.good()) {
