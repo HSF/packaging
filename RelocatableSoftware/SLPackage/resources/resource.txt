@@ -1,1 +1,1 @@
-hello from builtin hsfreloc resource file!
+hello from builtin SLPackage resource file!

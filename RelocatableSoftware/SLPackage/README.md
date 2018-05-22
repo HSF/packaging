@@ -18,7 +18,7 @@ README):
 
 ```console
 $ ls
-CMakeLists.txt README.md      slp_program       programs       scripting
+CMakeLists.txt README.md      programs       resources      scripting
 $ mkdir build
 $ cd build
 $ cmake ..
@@ -45,7 +45,7 @@ Compiled Languages
 The [programs](programs) directory focuses on C/C++ implementations, but PRs are
 welcome to demonstrate application/library self-location in other languages.
 
-The `slp_program` program
+The `slp-binreloc` program
 ----------------------
 
 This basic C/C++ example demonstrates the use of the [`binreloc`](programs/binreloc)
@@ -54,26 +54,26 @@ file "resource.txt" to show how these can be located. Simply running the applica
 will print its location and the contents of the resource file:
 
 ``` console
-$ ./BuildProducts/bin/slp_program
+$ ./BuildProducts/bin/slp-binreloc
 [application in]: /AbsPathToWhereYouRanCMake/./BuildProducts/bin
-[resource]: 'hello from builtin slp_program resource file!
+[resource]: 'hello from builtin SLPackage resource file!
 '
 $
 ```
 
 Relocatability can be tested by copying the `BuildProducts` directory to any other location
-you like on the local machine. Rerun `slp_program` and it should print its new location and
+you like on the local machine. Rerun `slp-binreloc` and it should print its new location and
 the resource contents. You can prove that it's not using build time paths by removing
 the original build directory.
 
 
-The `slp_program-poco` program
+The `slp-poco` program
 ---------------------------
 
 Demonstrates the self-location interfaces supplied by the [Poco](http://pocoproject.org) libraries.
 
 
-The `slp_program-qt` program
+The `slp-qt` program
 -------------------------
 
 Demonstrates the self-location interfaces supplied by the [Qt5](https://www.qt.io) libraries.
