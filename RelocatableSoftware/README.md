@@ -94,10 +94,10 @@ the corresponding technical aspects:
 - **How does `hsfreloc` locate its dynamic library `libhsfreloc.so` dependency at runtime?**
   - _Link/Run time lookup of dynamic libraries_
 - **How does `hsfreloc` locate its `resource.txt` file, or `libhsfreloc` its plugins at runtime?**
-  - _Binary self-location on the filesystem at runtime_
-- **How do `HSFReloc`'s CMake and pkg-config support files find `HSFReloc`'s library and headers
+  - [_Binary self-location on the filesystem at runtime_](HSFReloc)
+- **How do `HSFReloc`'s CMake, pkg-config, and other support files find `HSFReloc`'s library and headers
   when used by a client?**
-  - _Script self-location on the filesystem at runtime_
+  - [_Script self-location on the filesystem at runtime_](DevTools)
 
 A further item to be considered is what happens if `HSFReloc` uses files
 from another package (e.g. `hsfreloc` or `libhsfreloc` links to a "`libbar`").
