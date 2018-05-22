@@ -12,7 +12,7 @@ provides several benefits, including
   installation at the same location either at install or use time (e.g.
   NFS/AFS/CVMFS mount point)
 
-This document describes the issues that arise in implementing relocatability
+This document describes some of the issues that arise in implementing relocatability
 in software packages from the source code to binary packaging level, and
 discusses tools and techniques to help the developer and end user. Several
 example projects in C++ and Python are provided as illustrations.
@@ -22,7 +22,7 @@ from others in use or under consideration.
 
 What is Relocatability?
 =======================
-Say we install a package `HSFReloc` that comprises a program, library and
+Say we have installed a package `HSFReloc` that comprises a program, library, plugins, and
 resource files:
 
 ```
@@ -36,7 +36,10 @@ resource files:
           |  +- hsfreloc.h                  |    |
           +- lib/                           |    |
           |  +- libhsfreloc.so <---- links to    |
-          |  +- cmake/                           |
+          |  +- plugins/     |                   |
+          |  |  +- a.so    <-|                   |
+          |  |  +- b.so    <-| loads             |
+          |  +- cmake/                           |
           |  |  +- HSFReloc/                     |
           |  |     +- HSFRelocConfig.cmake       |
           |  +- pkgconfig/                       |
@@ -63,6 +66,9 @@ $ mv /home/user/Projects/HSFReloc /home/user/Another/Workspace
              |  +- hsfreloc.h
              +- lib/
              |  +- libhsfreloc.so
+             |  +- plugins/
+             |  |  +- a.so
+             |  |  +- b.so
              |  +- cmake/
              |  |  +- HSFReloc/
              |  |     +- HSFRelocConfig.cmake
@@ -73,11 +79,11 @@ $ mv /home/user/Projects/HSFReloc /home/user/Another/Workspace
                    +- resource.txt
 ```
 
-and the user would be able to run `hsfreloc` without making *any* changes
+and the user would be able to run `hsfreloc` or link to `libhsfreloc` without making *any* changes
 either to the files comprising `HSFReloc` or the runtime environment (`PATH`
 might be edited for convenience, but `hsfreloc` would still be runnable via a fully
-qualified path). Note that the relocation keeps the files comprising
-`HSFreloc` in the same locations relative to each other.
+qualified path). _Note that the relocation keeps the files comprising
+`HSFreloc` in the same locations relative to each other_.
 [OS X Application and Framework Bundles/Packages](https://developer.apple.com/library/mac/documentation/CoreFoundation/Conceptual/CFBundles/Introduction/Introduction.html#//apple_ref/doc/uid/10000123i)
 are the classic example of relocatable programs and libraries respectively, and
 the term 'Portable Binary' is often used on Linux.
@@ -85,13 +91,13 @@ the term 'Portable Binary' is often used on Linux.
 Though basic, this example illustrates three of the core issues of relocatability and
 the corresponding technical aspects:
 
-- How does `hsfreloc` locate its dynamic library `libhsfreloc.so` dependency at runtime?
-  - Link/Run time lookup of dynamic libraries
-- How does `hsfreloc` locate its `resource.txt` file at runtime?
-  - Binary self-location on the filesystem at runtime
-- How do `HSFReloc`'s CMake and pkg-config support files find `HSFReloc`'s library and headers
-  when used by a client?
-  - Script self-location on the filesystem at runtime
+- **How does `hsfreloc` locate its dynamic library `libhsfreloc.so` dependency at runtime?**
+  - _Link/Run time lookup of dynamic libraries_
+- **How does `hsfreloc` locate its `resource.txt` file, or `libhsfreloc` its plugins at runtime?**
+  - _Binary self-location on the filesystem at runtime_
+- **How do `HSFReloc`'s CMake and pkg-config support files find `HSFReloc`'s library and headers
+  when used by a client?**
+  - _Script self-location on the filesystem at runtime_
 
 A further item to be considered is what happens if `HSFReloc` uses files
 from another package (e.g. `hsfreloc` or `libhsfreloc` links to a "`libbar`").
@@ -152,9 +158,9 @@ Whilst this does enable relocatability, it relies on the user setting this
 variable correctly, knowing to do so, and changing it if the package is
 moved. It is easier if the binary can introspect itself at runtime
 to determine where on the filesystem its physical file is stored - this
-is *self-location*. Using this information, the path to the `resource.txt`
+is _self-location_. Using this information, the path to the `resource.txt`
 file can be determined by joining the binary file path with the
-*relative path* to the resource file. Here, the relative path is known
+_relative path_ from it to the resource file. Here, the relative path is known
 at compile/install time so is hard-coded into the binary, but because
 it is relative, the "bundle" of binary and resource may be freely
 moved together without invalidating the relative path between the files.
@@ -258,7 +264,8 @@ Some basic techniques, but also APIs, are demonstrated in the [`HSFReloc`](HSFRe
   - [Poco](http://pocoproject.org/docs/Poco.Util.Application.html)
 
 There are some paths to resource files that, depending on exact use case, may require
-hard-coding or use of standard environment variables. On UNIX, these could include
+hard-coding or use of standard environment variables. On UNIX these are typically the
+directories used for/by system programs, or for temporary usage.
 
 - `/etc`
 - `/var`
