@@ -1,0 +1,14 @@
+dev-util/cmake ~amd64
+
+dev-libs/boost ~amd64
+dev-util/boost-build ~amd64
+
+sci-physics/clhep ~amd64
+sci-physics/geant ~amd64
+sci-physics/geant-data ~amd64
+
+dev-libs/xxhash ~amd64
+net-libs/davix ~amd64
+sci-libs/gsl ~amd64
+dev-libs/vc ~amd64
+sci-physics/root ~amd64
