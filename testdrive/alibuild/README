@@ -10,7 +10,7 @@ cc7-nix-alibuild
 tested setup. It's only purpose is to serve as demonstrator of various possible
 techniques and to stress a few design points I think are important.
 
-This is a docker container, based on Graeme cc7-nix, which has three goals:
+This is a docker container, based on Graeme's cc7-nix, which has three goals:
 
 - Allow people to play with aliBuild.
 - Show how you do a nix overlay to customise the official nix distribution to
