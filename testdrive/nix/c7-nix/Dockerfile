@@ -27,11 +27,59 @@ ENV NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt
 
 # Change from the default unstable channel to 18.03 (last release, April 2018)
 RUN nix-channel --remove nixpkgs
-RUN nix-channel --add https://nixos.org/channels/nixos-18.03 nixos
+RUN nix-channel --add https://nixos.org/channels/nixos-18.03 nixpkgs
 RUN nix-channel --update
 
 # Now install a few basic nix packages, as a development bootstrap
-RUN nix-env -i gcc boost cmake python
+RUN nix-env -i -f '<nixpkgs>' \
+    -A autoconf \
+    -A automake \
+    -A bashInteractive \
+    -A bzip2 \
+    -A cmake \
+    -A coreutils \
+    -A cpio \
+    -A cracklib \
+    -A curl \
+    -A diffutils \
+    -A ed \
+    -A elfutils \
+    -A expat \
+    -A findutils \
+    -A gawk \
+    -A gcc \
+    -A git \
+    -A gnugrep \
+    -A gnumake \
+    -A gnused \
+    -A gzip \
+    -A less \
+    -A man \
+    -A pcre \
+    -A perl \
+    -A python \
+    -A rsync \
+    -A strace \
+    -A tcl \
+    -A vim \
+    -A wget \
+    -A which \
+    -A xz \
+    -A zlib \
+    -A zsh
 
-ENTRYPOINT ["bash"]
+# Install the toolchain
+RUN nix-env -i -f '<nixpkgs>' \
+    -A boost166 \
+    -A gsl \
+    -A qt510.qtbase \
+    -A root \
+    -A xercesc
+
+# For now the upstream GEANT4 recipe is a little weird but it seems like someone is working on it:
+# https://github.com/NixOS/nixpkgs/pull/40618
+# As it is badly written it isn't available in the binary cache so this will trigger a build
+RUN nix-env -i -f '<nixpkgs>' -A geant4.v10_0_2
+
+ENTRYPOINT ["/home/hsf/.nix-profile/bin/bash"]
 CMD ["-l"]
