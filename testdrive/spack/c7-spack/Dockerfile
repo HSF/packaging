@@ -28,7 +28,8 @@ RUN yum update -y               && \
         patch                 \
         openssh-server        \
         python                \
-        tcl                && \
+        tcl                   \
+        which              && \
     git clone --depth 1 git://github.com/spack/spack.git /spack && \
     rm -rf /spack/.git
 
