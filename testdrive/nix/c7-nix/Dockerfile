@@ -38,4 +38,4 @@ RUN nix-env -ir -f /home/hsf/testdrive_environment.nix -A env
 # For deployment we could either:
 #    - source a script to initialise an identical environment
 #    - add support for discovering the install location (multiple options are available)
-CMD ["nix-shell", "--pure", "/home/hsf/testdrive_environment.nix"]
+CMD ["nix-shell", "--pure", "--command", "export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt; return", "/home/hsf/testdrive_environment.nix"]
