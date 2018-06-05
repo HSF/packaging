@@ -8,6 +8,7 @@ We currently have test drives for:
 - [nix](nix)
 - [portage](portage)
 - [spack](spack)
+- [aliBuild](alibuild)
 
 See the READMEs in each directories for more details on the tool and instructions for taking it for a test drive.
 If you want to create a test drive for a new package manager, please see the information below.
