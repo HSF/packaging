@@ -1,6 +1,6 @@
 SLPackage
 ===========
-Example program/library code to demonstrate package relocatability concepts.
+Example program/library code to demonstrate basic relocation concepts.
 The following software is required to build the base set of programs:
 
 - [CMake](https://www.cmake.org) version 3.3 or newer
@@ -27,7 +27,7 @@ $ cmake --build .
 
 If CMake has issues finding any dependencies, ensure their root install
 prefixes are listed in `CMAKE_PREFIX_PATH` and pass this list to
-`cmake` on the command line or setting it in your environment.
+`cmake` on the command line or set it in your environment.
 
 Build Outputs
 =============
@@ -40,13 +40,14 @@ the `BuildProducts` directory will contain an extra level of directories
 to support each build type (`Release`, `Debug` etc)
 
 
-Compiled Languages
-==================
-The [programs](programs) directory focuses on C/C++ implementations, but PRs are
-welcome to demonstrate application/library self-location in other languages.
+Programs/Applications
+=====================
+The [programs](programs) directory contains executables in C++, Python, and
+Ruby that demonstrate program self-location in these languages. PRs are
+welcome to demonstrate this functionality in other languages.
 
-The `slp-binreloc` program
-----------------------
+C++: The `slp-binreloc` program
+-------------------------------
 
 This basic C/C++ example demonstrates the use of the [`binreloc`](programs/binreloc)
 library for simple application self-location. It also comes with a basic resource
@@ -67,23 +68,27 @@ the resource contents. You can prove that it's not using build time paths by rem
 the original build directory.
 
 
-The `slp-poco` program
+C++: The `slp-poco` program
 ---------------------------
 
 Demonstrates the self-location interfaces supplied by the [Poco](http://pocoproject.org) libraries.
 
 
-The `slp-qt` program
+C++: The `slp-qt` program
 -------------------------
 
 Demonstrates the self-location interfaces supplied by the [Qt5](https://www.qt.io) libraries.
 
 
-Scripting Languages
-===================
-The directories under [scripting](scripting) contain (very) basic
-examples of relocatable Python and Ruby programs. If your language du jour
-is not in here, feel free to add a PR showing how it implements self-location.
+Python: The `slp-python` program
+--------------------------------
+
+Demonstrates basic self-location in Python.
+
+Ruby: The `slp-ruby` program
+----------------------------
+
+Demonstrates basic self-location in Ruby.
 
 
 Dealing with Packaging Issues

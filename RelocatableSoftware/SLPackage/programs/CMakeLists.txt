@@ -1,6 +1,5 @@
 # - Build application/library using binreloc for self-location
 
-
 # - Configure binreloc
 # Just mangles symbols which is not strictly neccessary for programs.
 # However, when we use it in libraries, we *might* get symbol clashes if
@@ -57,4 +56,6 @@ else()
   add_executable(slp-qt slp-qt.cpp)
   target_link_libraries(slp-qt Qt5::Core)
 endif()
+
+
 
