@@ -1,7 +1,7 @@
 Relocatable Software: Issues, Tools and Techniques
 ==================================================
-A **Relocatable** software package is one in which the contents of the package
-(programs, libraries, resource files) can be moved lock stock from its
+A **Relocatable** software package is one in which a package
+(collection of programs, libraries, resource files) can be moved lock stock from its
 initial installation location to anywhere else on the filesystem and still
 run *without* user intervention. Implementing this ability in software
 provides several benefits, including
@@ -12,13 +12,13 @@ provides several benefits, including
   installation at the same location either at install or use time (e.g.
   NFS/AFS/CVMFS mount point)
 
-This document describes some of the issues that arise in implementing relocatability
-in software packages from the source code to binary packaging level, and
+This document describes some of the issues that arise in making relocatable
+software packages from the source code to binary packaging level, and
 discusses tools and techniques to help the developer and end user. Several
-example projects in C++ and Python are provided as illustrations.
-Whilst primarily concerned with the "front line" programming languages
+example projects in C++ and Python are provided as illustrations of the
+techniques. Whilst primarily concerned with the "front line" programming languages
 used in HEP (C, C++ and Python), it is open to comments and examples
-from others in use or under consideration.
+from other languages in use or under consideration.
 
 What is Relocatability?
 =======================
@@ -49,7 +49,7 @@ resource files:
                 +- resource.txt <-------------- reads
 ```
 
-If `SLPackage` is relocatable, then we can move its contents across the filesystem, e.g.:
+If `SLPackage` is relocatable, then we can move it across the filesystem, e.g.:
 
 ```
 $ mv /home/user/Projects/SLPackage /home/user/Another/Workspace
@@ -80,7 +80,7 @@ $ mv /home/user/Projects/SLPackage /home/user/Another/Workspace
 ```
 
 and the user would be able to run `slp_program` or link to `libslp` without making *any* changes
-either to the files comprising `SLPackage` or the runtime environment (`PATH`
+to either the files comprising `SLPackage` or the runtime environment (`PATH`
 might be edited for convenience, but `slp_program` would still be runnable via a fully
 qualified path). _Note that the relocation keeps the files comprising
 `SLPackage` in the same locations relative to each other_.
@@ -93,7 +93,7 @@ the corresponding technical aspects:
 
 - **How does `slp_program` locate its dynamic library `libslp.so` dependency at runtime?**
   - _Link/Run time lookup of dynamic libraries_
-- **How does `slp_program` locate its `resource.txt` file, or `libslp` its plugins at runtime?**
+- **How does `slp_program` locate its `resource.txt` file, or `libslp` its `plugin`s at runtime?**
   - [_Binaries able to self-locate themselves on the filesystem at runtime_](SLPackage)
 - **How do `SLPackage`'s CMake, pkg-config, and other support files find `SLPackage`'s library and headers
   when used by a client?**
@@ -109,8 +109,8 @@ different mount points or even between different systems. Of course the package 
 OS/toolchain mounting the filesystem is the same, or binary compatible
 with, the OS/toolchain the package was built for. Though not a direct
 issue for relocatability, programming and compiling for binary
-compatibility are helpful for simplifying binary packaging and deployment.
- The issues here include:
+compatibility is helpful for simplifying binary packaging and deployment.
+The issues here include:
 
 - Software development
   - Mostly a training/policy issue for individual projects (but perhaps HSF can help)
@@ -125,9 +125,8 @@ compatibility are helpful for simplifying binary packaging and deployment.
 - Building binaries
   - Policy issue for packager(s).
   - Target minimal system API/ABI, e.g. `-mmacosx-min-version` on OS X or build for suitable
-    minimum glibc on Linux.
-  - On Linux, consider "standalone" toolkit of glibc, binutils, gcc.
-
+    minimum `glibc` on Linux.
+  - On Linux, consider "standalone" toolkit of glibc, binutils, gcc (c.f. Nix, Portage, Linuxbrew package managers)
 
 (Re)Locating the Interpreter for Programs
 =========================================
