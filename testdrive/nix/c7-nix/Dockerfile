@@ -11,6 +11,13 @@ RUN useradd -G wheel -p '$6$JmsT1xYM$CdWIKb6aHhqWniaanWDq1Hi9qF4pXJlmsSHrqDDjF8C
 COPY sudoers /etc/suoders
 # Pre-create the /nix area because here we install as a single user
 RUN mkdir -m 0755 /nix && chown hsf /nix
+
+# Copy a nix expression that is used to define the environment
+COPY testdrive_environment.nix clhep.nix /home/hsf/
+# COPY geant4 /home/hsf/geant4
+RUN chown -R hsf /home/hsf && chgrp -R hsf /home/hsf
+
+# Install nix
 USER hsf
 ENV USER=hsf \
     HOME=/home/hsf
@@ -26,9 +33,6 @@ ENV PATH=/home/hsf/.nix-profile/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/us
 RUN nix-channel --remove nixpkgs && \
     nix-channel --add https://nixos.org/channels/nixos-18.03 nixpkgs && \
     nix-channel --update
-
-# Use a nix expression to define the environment
-COPY testdrive_environment.nix /home/hsf/testdrive_environment.nix
 
 # Install the test drive environment in the default location
 RUN nix-env -ir -f /home/hsf/testdrive_environment.nix -A env
