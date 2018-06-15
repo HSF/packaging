@@ -12,7 +12,7 @@ provides several benefits, including
   installation at the same location either at install or use time (e.g.
   NFS/AFS/CVMFS mount point)
 
-This document describes some of the issues that arise in making relocatable
+This project describes some of the issues that arise in making relocatable
 software packages from the source code to binary packaging level, and
 discusses tools and techniques to help the developer and end user. Several
 example projects in C++ and Python are provided as illustrations of the
@@ -91,17 +91,13 @@ the term 'Portable Binary' is often used on Linux.
 Though basic, this example illustrates three of the core issues of relocatability and
 the corresponding technical aspects:
 
-- **How does `slp_program` locate its dynamic library `libslp.so` dependency at runtime?**
-  - _Link/Run time lookup of dynamic libraries_
 - **How does `slp_program` locate its `resource.txt` file, or `libslp` its `plugin`s at runtime?**
   - [_Binaries able to self-locate themselves on the filesystem at runtime_](SLPackage)
+- **How does `slp_program` locate its dynamic library `libslp.so` dependency at runtime?**
+  - _Link/Run time lookup of dynamic libraries_
 - **How do `SLPackage`'s CMake, pkg-config, and other support files find `SLPackage`'s library and headers
   when used by a client?**
   - [_Script self-location on the filesystem at runtime_](DevTools)
-
-A further item to be considered is what happens if `SLPackage` uses files
-from another package (e.g. `slp_program` or `libslp` links to a "`libbar`").
-This is deferred to a later section.
 
 Whilst the example only illustrates moving a package across a local
 filesystem, it is equally valid for moves across network filesystems with
@@ -160,15 +156,17 @@ Rather than hard coding system or custom interpreter paths, script authors shoul
 print("hello world")
 ```
 
-Use of `env` makes the program relocatble, but defers location of the interpreter to the `PATH` environment variable,
+Use of `env` makes the program relocatable, but defers location of the interpreter to the `PATH` environment variable,
 and consequently the configuration management system for the software stack. Whilst package authors should prefer
 usage of the `env` pattern, software stack managers can also consider rewriting the shebang line during install
 and on any relocation to the absolute path of the required interpreter. As it is plain text, simple regular expression
 replacement can be used, but the chosen packaging system must support this, and care must be taken
 if the resultant stack is to be deployed over network file systems (and hence unknown mount points).
 
-**TODO?** Binaries *also* have an interpreter (on Linux, `ld-linux.so`, On macOS, `dyld`). These are also hardcoded,
-though can be changed with, e.g., `patchelf` for ELF binaries.
+Binary programs (ELF, Mach-O) also have interpreters. Whilst it is not normally
+required to change these, tools such as `patchelf` provide the required
+functionality. Developers do not need to worry about this in their packages/builds
+as any rewrite of the interpreter should be handled by the package manager.
 
 
 (Re)Locating Dynamic Libraries
@@ -229,27 +227,27 @@ Things that the packaging system should do (inc. any packaging system provided b
 Things best left to configuration management.
 
 
-
-
 Relocatability with External Dependencies
 =========================================
+So far we have only considered a package with no external dependencies
+other than always required OS/language standard libraries. What happens if
+our `SLPackage` binaries link with those from another package,
+e.g. `slp_program` or `libslp` links to a "`libbar`" from package `Bar`.
 
-What happens to relocatability when we have two packages with a dependency?
-For example `Foo` and `Bar`, with `Foo` linking to `libbar` from `Bar`.
-
-1. Can move `Foo` if its `RPATH` contains absolute path to `libbar`.
-2. Cannot move `Bar` without updating `Foo`'s RPATH or using/updating dynamic
-   loader paths
-3. Can move both `Foo` and `Bar` provided relative RPATHs
+1. We can move `SLPackage` if the binaries have `RPATH` with an absolute path to `libbar`.
+2. We cannot move `Bar` without updating `Foo`'s RPATH or using/updating dynamic
+   loader environment paths
+3. We can move both `SLPackage` and `Bar` provided relative RPATHs
    are used and both stay in the same locations relative to each other.
 
-**TODO**: Cases for text/resource file dependencies?
-
+This only covers the case for typical binary dependencies. If dependencies exist between
+package's resource files (e.g. data, configuration), similar solutions can apply
+if access uses a path-like lookup mechanism.
 
 
 Patching Upstream Software
 ==========================
-The preceeding sections cover cases where "we" are developing the
+The preceding sections cover cases where "we" are developing the
 software, or have identified relocatability issues and are in a
 position to patch these. Typical HEP software
 stacks will use a large number of packages not directly maintained by
@@ -280,7 +278,9 @@ patching is likely to work. For simple cases, application of the
 techniques discussed earlier may be able to provide a fully relocatable
 solution. At worst, hard coded paths could be replaced with environment
 variable lookup and wrapper scripts. In more complex cases, it may be possible to patch the
-binary directly at install time (**TODO**: tools for this?) to
+binary directly at install time (**TODO**: tools for this? One known
+limitation is that new path must be shorter than old one. Easy to pad
+with null bytes, adding more space changes offsets etc) to
 rewrite hardcoded paths. Note that this still results in hard coded
 paths, so can only really be handled by a package manager system and would
 not work for deploying software over network file systems where final
@@ -290,6 +290,7 @@ Interpreter Paths
 -----------------
 Shebangs are plain text, so are straightforward to patch directly using regular expression
 find/replace directly, or via tooling at build or install time.
+
 
 Library RPATHs
 --------------
