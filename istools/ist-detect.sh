@@ -1,5 +1,22 @@
 #!/bin/sh
 # Return list of instruction sets supported by host CPU, sorted oldest -> newest
+# Known instruction sets, from oldest to newest are (from Table 13.1 in
+# http://www.agner.org/optimize/optimizing_cpp.pdf):
+#
+# - 80386
+# - SSE
+# - SSE2
+# - SSE3
+# - SSSE3
+# - SSE4.1
+# - SSE4.2
+# - AVX
+# - AVX2
+# - FMA3
+# - AVX-512
+#
+# Instructions sets are backward compatible, so code compiled with, e.g. SSE3, will
+# run on a platform supported that instruction set or newer.
 # TODO:
 # - Additional platforms (BSD?, Windows, though that would have to be PS/Bat)
 # - What about multisocket machines with hetrogeneous physical CPUs...

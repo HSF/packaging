@@ -13,6 +13,31 @@ third-party packages that set handle instructions sets in their
 own way. We also look at ways to discover available instruction sets
 at runtime to construct the platform tags as [described on slide 6](https://indico.cern.ch/event/719557/contributions/2965980/attachments/1642767/2624258/HSF-Packaging-20180502.pdf).
 
+# Quickstart
+The following software is needed to build and run the examples
+in this project:
+
+- Linux or macOS system (Windows, other POSIX platforms TBD)
+- C/C++ compiler with C++14 support
+- Bourne Shell
+- CMake 3.9 or newer
+- Make or Ninja buildtools
+
+To build and test the programs, create a build directory,
+run `cmake`, then `make`:
+
+```
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+$ ./ist-detect
+$ ./ist-detect-cpp
+```
+
+See the following sections for details on each of the available
+programs and examples.
+
 # Instruction Set Detection
 We can determine the capabilities of the running CPU(s) in many ways.
 
@@ -28,6 +53,29 @@ output a list of capabilities. Note that:
   on Linux is indicated by the flag `sse4_1`, whereas macOS lists it as `sse4.1`
   (after lowercasing).
 - The list is all capabilities, so more than SIMD flags are listed.
+
+## C/C++ Interfaces
+Using C/C++, direct Assembly or suitable wrappers such as `__cpuid` can
+be used. The simple `ist-detect.cpp` program uses the `instrset` interfaces
+from the [Vector Class Library](http://www.agner.org/optimize/vectorclass.pdf)
+to print out an integer representing the newest instruction set supported by
+the host CPU. As of Vector Class v1.25, these are:
+
+- `0           = 80386 instruction set`
+- `1  or above = SSE (XMM) supported by CPU (not testing for O.S. support)`
+- `2  or above = SSE2`
+- `3  or above = SSE3`
+- `4  or above = Supplementary SSE3 (SSSE3)`
+- `5  or above = SSE4.1`
+- `6  or above = SSE4.2`
+- `7  or above = AVX supported by CPU and operating system`
+- `8  or above = AVX2`
+- `9  or above = AVX512F`
+- `10 or above = AVX512VL`
+- `11 or above = AVX512BW, AVX512DQ`
+
+One can expect this list to extend as time moves on, though this project will
+likely not keep in lock step as it is a pure demo.
 
 # Useful Links
 ## General
