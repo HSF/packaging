@@ -45,14 +45,65 @@ We can determine the capabilities of the running CPU(s) in many ways.
 At the basic system programming level, we can can use the `/proc/cpuinfo`
 file (Linux) or `sysctl` program (macOS). The simple shell script
 `ist-detect.sh` demonstrates a basic Bourne-shell script to query these and
-output a list of capabilities. Note that:
+output a list of capabilities. It may be run from the build directory directly as:
 
-- On macOS, the output of sysctl is uppercase, so we lower the output for
+```console
+$ ./ist-detect --usage
+Usage: ist-detect [OPTION]
+
+Supported values for OPTION are:
+
+  --all-capabilities     print all CPU capabilities of this host
+  --simd-capabilities    print all SIMD capabilities of this host
+  --help                 display this help and exit
+
+$
+```
+
+Here, the `--all-capabilities` argument will display the list of all CPU
+capabilities of the current host. The `--simd-capabilties` argument will display
+just the SIMD flags. Note that
+
+- On macOS, the output of `sysctl` is uppercase, so we lower the output for
   compatibility with Linux.
 - Given capabilities are not always listed identically, e.g. SSE4.X availablity
   on Linux is indicated by the flag `sse4_1`, whereas macOS lists it as `sse4.1`
-  (after lowercasing).
-- The list is all capabilities, so more than SIMD flags are listed.
+  (after lowercasing). A standard format is on the TODO list.
+
+
+## C/C++ Interfaces
+Using C/C++, direct Assembly or suitable wrappers such as `__cpuid` can
+be used. The simple `ist-detect.cpp` program uses the `instrset` interfaces
+from the [Vector Class Library](http://www.agner.org/optimize/vectorclass.pdf)
+to print out an integer representing the newest instruction set supported by
+the host CPU. As of Vector Class v1.28, these are:
+
+- `0           = 80386 instruction set`
+- `1  or above = SSE (XMM) supported by CPU (not testing for O.S. support)`
+- `2  or above = SSE2`
+- `3  or above = SSE3`
+- `4  or above = Supplementary SSE3 (SSSE3)`
+- `5  or above = SSE4.1`
+- `6  or above = SSE4.2`
+- `7  or above = AVX supported by CPU and operating system`
+- `8  or above = AVX2`
+- `9  or above = AVX512F`
+- `10 or above = AVX512VL`
+- `11 or above = AVX512BW, AVX512DQ`
+
+One can expect this list to extend as time moves on, though this project will
+likely not keep in lock step as it is a pure demo.
+
+The `ist-detect.cpp` file is compiled by the build to the `ist-detect-cpp` program.
+This may be executed directly from the build directory, where it will
+output an ordered list of oldest to newest SIMD instructions supported by the
+host. For example on a macOS host with Xeon CPU:
+
+```
+$ ./ist-detect-cpp
+Most modern SIMD available: avx
+Supported SIMD: 80386 sse sse2 sse3 ssse3 sse4_1 sse4_2 avx
+```
 
 ## C/C++ Interfaces
 Using C/C++, direct Assembly or suitable wrappers such as `__cpuid` can
