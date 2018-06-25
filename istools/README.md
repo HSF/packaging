@@ -76,7 +76,7 @@ Using C/C++, direct Assembly or suitable wrappers such as `__cpuid` can
 be used. The simple `ist-detect.cpp` program uses the `instrset` interfaces
 from the [Vector Class Library](http://www.agner.org/optimize/vectorclass.pdf)
 to print out an integer representing the newest instruction set supported by
-the host CPU. As of Vector Class v1.25, these are:
+the host CPU. As of Vector Class v1.28, these are:
 
 - `0           = 80386 instruction set`
 - `1  or above = SSE (XMM) supported by CPU (not testing for O.S. support)`
@@ -93,6 +93,17 @@ the host CPU. As of Vector Class v1.25, these are:
 
 One can expect this list to extend as time moves on, though this project will
 likely not keep in lock step as it is a pure demo.
+
+The `ist-detect.cpp` file is compiled by the build to the `ist-detect-cpp` program.
+This may be executed directly from the build directory, where it will
+output an ordered list of oldest to newest SIMD instructions supported by the
+host. For example on a macOS host with Xeon CPU:
+
+```
+$ ./ist-detect-cpp
+Most modern SIMD available: avx
+Supported SIMD: 80386 sse sse2 sse3 ssse3 sse4_1 sse4_2 avx
+```
 
 # Useful Links
 ## General
