@@ -45,14 +45,31 @@ We can determine the capabilities of the running CPU(s) in many ways.
 At the basic system programming level, we can can use the `/proc/cpuinfo`
 file (Linux) or `sysctl` program (macOS). The simple shell script
 `ist-detect.sh` demonstrates a basic Bourne-shell script to query these and
-output a list of capabilities. Note that:
+output a list of capabilities. It may be run from the build directory directly as:
 
-- On macOS, the output of sysctl is uppercase, so we lower the output for
+```console
+$ ./ist-detect --usage
+Usage: ist-detect [OPTION]
+
+Supported values for OPTION are:
+
+  --all-capabilities     print all CPU capabilities of this host
+  --simd-capabilities    print all SIMD capabilities of this host
+  --help                 display this help and exit
+
+$
+```
+
+Here, the `--all-capabilities` argument will display the list of all CPU
+capabilities of the current host. The `--simd-capabilties` argument will display
+just the SIMD flags. Note that
+
+- On macOS, the output of `sysctl` is uppercase, so we lower the output for
   compatibility with Linux.
 - Given capabilities are not always listed identically, e.g. SSE4.X availablity
   on Linux is indicated by the flag `sse4_1`, whereas macOS lists it as `sse4.1`
-  (after lowercasing).
-- The list is all capabilities, so more than SIMD flags are listed.
+  (after lowercasing). A standard format is on the TODO list.
+
 
 ## C/C++ Interfaces
 Using C/C++, direct Assembly or suitable wrappers such as `__cpuid` can
