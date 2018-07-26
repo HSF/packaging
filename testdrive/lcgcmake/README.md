@@ -4,17 +4,12 @@ This document will walk you through preparing and using the [LCGCMake](https://g
 package manager to install a basic software stack for HEP.
 
 LCGCMake is the EP-SFT infrastructure to build the software stack for the LHC experiments
-containing both external software dependencies and projects developed within our group.
-The tool is based on the [ExternalProject](http://www.kitware.com/media/html/BuildingExternalProjectsWithCMake2.8.html) module
+containing both external software dependencies and projects developed within the same group.
+The tool is based on the [`ExternalProject`](http://www.kitware.com/media/html/BuildingExternalProjectsWithCMake2.8.html) module
 of [CMake](https://cmake.org/).
 
 
 ## Base Operating System Install
-
-_**AUTHORS:**_ _Assume a base system of macOS High Sierra with Xcode 9, or a Docker Image based on centos:centos7 or
-ubuntu:xenial. In the Docker case, supply (a) Dockerfile(s) for each system, adding any additional system packages
-required, and (b) an `hsf` user with `sudo` privileges that the container will run as. There’s no requirement
-to build and host the images. Bonus points: Singularity! If macOS needs additional packages, document them below:_
 
 Test driving LCGCMake requires either a CentOS6/7, Ubuntu 16.04LTS, or macOS High Sierra system. For macOS, only the base system
 plus Xcode 9 from the App Store is required. Additional platform-specific requirements are specified on the official [documentation](https://gitlab.cern.ch/sft/lcgcmake#pre-requisites).
@@ -28,7 +23,7 @@ docker pull hepsoftwarefoundation/c7-lcgcmake:latest
 docker run -it hepsoftwarefoundation/c7-lcgcmake:latest bash
 ```
 
-**Not yet uploaed**, meanwhile:
+**Not yet uploaded**, meanwhile:
 
 ```
 # To pull it from dockerhub
@@ -43,41 +38,59 @@ Optionally, you may use an existing Linux installation, but you may encounter er
 
 ## Installing LCGCMake
 
-To install LCGCMake just checkout the lcgcmake package from lcgsoft GIT repository:
+1. **Install lcgcmake** by  just cloning the lcgcmake package from CERN GitLab and ensure that the PATH environment variable contains the `bin: directory from the just cloned repository.
 
-```
-git clone https://gitlab.cern.ch/sft/lcgcmake.git
-```
+  ```
+  git clone https://gitlab.cern.ch/sft/lcgcmake.git
+  export PATH=$PWD/lcgcmake/bin:$PATH
+  ```
 
-Then create a workspace area on which to perform the builds:
+2. **Configure the software stack** by selecting the compiler and version  of the stack to be used
 
-```
-mkdir lcgcmake-build
-cd lcgcmake-build
-```
+  ```
+  lcgcmake configure --no-binary --version=latest [--prefix=...]
+  ```
+  - You can see the available compilers with the command `lcgcmake show compilers`
+  - Similarly, you can see the available LCG stack versions with the command `lcgcmake show versions`
+  - Once you have configured you can inspect the configuration with the command  `lcgcmake show configuration`
 
-Finally check your installation running a simple build:
 
-```
-cmake -DLCG_VERSION=hsf -DCMAKE_INSTALL_PREFIX=../lcgcmake-install ../lcgcmake
-```
+3. **Installation** of the required packages
 
-This will configure the whole LCGCMake project using the package versions specified in `lcgcmake/cmake/toolchain/heptools-hsf.cmake`,
-which looks like this:
+  ```
+  lcgcmake install <list of package names>
+  ```
+  - You can see the list of packages (targets) with `lcgcmake show targets`
+
+
+4. **Setup environment and run** on a new shell with
+
+  ```
+  lcgcmake run
+  ```
+
+
+Previous steps will configure the whole LCGCMake project using the package versions specified in `lcgcmake/cmake/toolchain/heptools-latest.cmake`, which looks like this:
 
 ```
 # Application Area Projects
-LCG_AA_project(ROOT  v6.12.06)
-LCG_AA_project(Geant4 10.04.p01)
+if(NOT ${LCG_OS} STREQUAL mac)
+  LCG_AA_project(COOL  3_2_0)
+  LCG_AA_project(CORAL 3_2_0)
+endif()
+LCG_AA_project(RELAX root6)
+LCG_AA_project(ROOT  6.14.00)
 LCG_AA_project(HepMC 2.06.09)
+LCG_AA_project(Geant4 10.04.p01)
+LCG_AA_project(DD4hep 01-05)
 
 # Externals
+LCG_external_package(lcgenv            1.3.6                                  )
+LCG_external_package(hepmc3            3.0.0                                  )
+LCG_external_package(4suite            1.0.2p1                                )
+LCG_external_package(absl_py           0.2.0                                  )
+LCG_external_package(AIDA              3.2.1                                  )
 
-# ROOT Dependencies
-LCG_external_package(Python            2.7.14                                   )
-LCG_external_package(fftw              3.3.4                     fftw3          )
-LCG_external_package(graphviz          2.28.0                                   )
-LCG_external_package(GSL               2.4                                      )
 ```
 
 The output of the former command should be similar to this:
@@ -132,32 +145,33 @@ installed, to set it up just run the following command:
 scl enable devtoolset-6 bash
 ```
 
-This will run a different bash session where `gcc-6.3.1` is set as the main compiler, so LCGCMake will use it
+This will run a different shell where `gcc-6.3.1` is set as the main compiler, so LCGCMake will use it
 by default.
 
-Once the project has been configured, packages defined in `lcgcmake/cmake/toolchain/heptools-hsf.cmake` can be
+Additionally, `lcgcmake` can be also configured to use one of the preinstalled compilers in EOS (**we currently
+recommend this way**), by adding the `--compiler` option at configuration time:
+
+```
+lcgcmake configure --compiler=gcc62binutils --version=latest [--prefix=...]
+```
+
+Once the project has been configured, packages defined in `lcgcmake/cmake/toolchain/heptools-latest.cmake` can be
 built and installed using:
 
 ```
-make -jN <package>
-```
-
-To build all the packages defined in the heptool file, we can also use:
-
-```
-make -jN
+lcgcmake install <list of package names>
 ```
 
 The whole list of available packages can be shown using:
 
 ```
-make help
+lcgcmake show targets
 ```
 
 For example, we can check our installation installing `zlib`. it should look like this:
 
 ```
-[hsf@c3255eb2aa38 lcgcmake-build]$ make -j24 zlib
+$ lcgcmake install zlib
 Scanning dependencies of target zlib-1.2.11
 [  0%] Creating directories for 'zlib-1.2.11'
 [  0%] Performing download step (download, verify and extract) for 'zlib-1.2.11'
@@ -199,10 +213,10 @@ Scanning dependencies of target zlib
 [100%] Built target zlib
 ```
 
-As a result, `zlib` gets installed in the directory specify by the cmake options `DCMAKE_INSTALL_PREFIX`, which in this example is `/build/lcgcmake-install`:
+As a result, `zlib` gets installed in the directory specify by the cmake options `DCMAKE_INSTALL_PREFIX`, which by default is `/opt/lcg`:
 
 ```
-[hsf@c3255eb2aa38 lcgcmake-build]$ ls /build/lcgcmake-install/zlib/1.2.11/x86_64-centos7-gcc48-opt/
+$ ls /opt/lcg/zlib/1.2.11/x86_64-centos7-gcc48-opt/
 gen-post-install.log  include  lib  logs  share  version.txt  zlib-env.sh
 ```
 
@@ -224,16 +238,17 @@ The HSF Test Stack packages are as follows:
   - CLHEP (_Version to be compatible with Geant4_)
   - Geant4 10.3
 
-To install this stack, just run:
+
+To build all packages defined in the test stack, use the following custom target:
 
 ```
-make -jN
+lcgcmake install HSF-testdrive
 ```
 
-this will trigger the installation of all packages defined in `lcgcmake/cmake/toolchain/heptools-hsf.cmake`.
-This file currently contains the packages above-mentioned plus all their dependencies.
+<!-- this will trigger the installation of all packages defined in `lcgcmake/cmake/toolchain/heptools-hsf.cmake`.
+This file currently contains the packages above-mentioned plus all their dependencies. -->
 
-For each package, the source tarfile will be download from a private repo in EOS. This could be modified by
+For each package, the source tarfile will be downloaded from a private repo in EOS. This could be modified by
 any other source, like the original webpage or its github repo, on the recipe of the package. These recipes
 are splitted in different `CMakeLists.txt`:
 
@@ -241,35 +256,27 @@ are splitted in different `CMakeLists.txt`:
 - Project packages (MonteCarlo generator packages): `lcgcmake/generators/CMakeLists.txt`
 - Project packages (rest of the packages): `lcgcmake/externals/CMakeLists.txt`
 
-(NOTE: Binary installation would imply modifying the installation steps defined for each package)
+Optionally, binary installation can be enabled at configuration time removing the `--no-binary` option, since it is enabled by default:
 
-Optionally, ...
+```
+lcgcmake configure --version=latest
+```
 
-_**AUTHORS:**_ _Show any other features of the tool you think are useful here, e.g. build using different C++ Standards,
-optional components of packages, different package versions_
+Therefore, `lcgcmake` will first look at the [binary repository](http://lcgpackages.web.cern.ch/lcgpackages/tarFiles/releases/), if a package with the same specification (package + version + compiler + hash) was already installed and uploaded to the binary repository then it will be downloaded and installed from a tarball.
+
+<!-- _**AUTHORS:**_ _Show any other features of the tool you think are useful here, e.g. build using different C++ Standards,
+optional components of packages, different package versions_ -->
 
 # Using the HEP Test Stack
-To use the freshly installed test stack, it is quite convenient to build a `view`:
+To use a freshly installed test stack, it is quite convenient to build a `view`, `lcgcmake run` will create such view and start a new bash session with the environment ready to be used.
 
-```
-make view
-```
-
-which will be created again on the directory specify by `DCMAKE_INSTALL_PREFIX`. This view contains a `setup.sh`
-script to set a new environment with all the packages ready to be used:
-
-```
-source /build/lcgcmake-install/<platform-tag>/setup.sh
-```
-
-
-_**AUTHORS:**_ _Document the steps needed to setup a runtime environment for using
-the stack listed above, including optional parts if the tools allows this_
+<!-- _**AUTHORS:**_ _Document the steps needed to setup a runtime environment for using
+the stack listed above, including optional parts if the tools allows this_ -->
 
 # Adding a New Package to the Stack
 
 To add a new package to the stack, first you will need to add new package and its version to the list of packages in
-the heptool file (`lcgcmake/heptools-hsf.cmake` in our case) and steps to configure, build and install the package (as
+the heptool file (`lcgcmake/heptools-latest.cmake` in our case) and steps to configure, build and install the package (as
 well as any other required step) to the correspondant `CMakeLists.txt` file. For example, if we wanted to add `GSL-2.4` to our
 stack we would add the following code:
 
@@ -295,7 +302,8 @@ LCGPackage_Add(
 )
 ```
 
-
-_**AUTHORS:**_ _Document the steps needed to create a package for a simple C/C++
+<!-- _**AUTHORS:**_ _Document the steps needed to create a package for a simple C/C++
 library or application (your choice) and walkthrough the steps to build and install it. Reuse/link to the tool's
-own documentation on this if you think it's sufficient_
+own documentation on this if you think it's sufficient_ -->
+
+**Please refer to the [official documentation](https://gitlab.cern.ch/sft/lcgcmake/blob/master/README.md) for further information.**
