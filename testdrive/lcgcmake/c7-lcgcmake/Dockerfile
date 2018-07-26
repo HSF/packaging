@@ -1,15 +1,14 @@
 FROM centos:7
 MAINTAINER Javier Cervantes <javier.cervantes@cern.ch>
 
-ENV LCGCMAKE_ROOT=/build/lcgcmake            \
-    LCGCMAKE_BUILD=/build/lcgcmake-build     \
-    LCGCMAKE_INSTALL=/build/lcgcmake-install \
+ENV LCGCMAKE_ROOT=/usr/local/lcgcmake    \
     ARCH=x86_64
 
 
 # Install base requirements (extracted from Puppet configuration)
 RUN yum update -y                           && \
     yum install -y epel-release             && \
+    yum install -y http://linuxsoft.cern.ch/wlcg/centos7/x86_64/wlcg-repo-1.0.0-1.el7.noarch.rpm \
     yum update -y                           && \
     yum groupinstall -y "Development Tools" && \
     yum install -y          \
@@ -70,9 +69,8 @@ RUN yum install -y centos-release-scl-rh   && \
 
 
 # Setup LCGCMake
-RUN mkdir -p $LCGCMAKE_ROOT  && \
-    git clone -b hsf-test https://gitlab.cern.ch/sft/lcgcmake.git $LCGCMAKE_ROOT && \
-    mkdir $LCGCMAKE_BUILD $LCGCMAKE_INSTALL
+RUN git clone https://gitlab.cern.ch/sft/lcgcmake.git $LCGCMAKE_ROOT 
+#RUN cd $LCGCMAKE_ROOT && git checkout bab888e6
 
 # Copy heptool file
 # COPY heptools-hsf.cmake $LCGCMAKE_ROOT/cmake/toolchain
@@ -85,15 +83,16 @@ RUN useradd hsf
 
 ENV USER=hsf
 ENV HOME=/home/hsf
-WORKDIR $LCGCMAKE_BUILD
+WORKDIR /build
 
-RUN mkdir /local
-COPY lcgcmake-wrapper /local/lcgcmake
-RUN chmod +x+w /local/lcgcmake
+RUN ln -s $LCGCMAKE_ROOT/bin/lcgcmake /usr/local/bin/lcgcmake
+RUN chown hsf:hsf -R $LCGCMAKE_ROOT
+RUN chown hsf:hsf /usr/local/bin/lcgcmake
+RUN chmod +x /usr/local/bin/lcgcmake
+RUN chown hsf:hsf /opt
 
 RUN echo 'alias cmake="cmake3"' >> /home/hsf/.bashrc
 RUN echo 'export SHELL=/bin/bash' >> /home/hsf/.bashrc
-RUN echo 'export PATH=/local:$PATH' >> /home/hsf/.bashrc
 
 RUN chown hsf -R /build
 
