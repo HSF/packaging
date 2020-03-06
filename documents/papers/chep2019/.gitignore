@@ -1,0 +1,10 @@
+# Ignore all auxilliary files created by LaTeXing and friends
+*.pdf
+*.aux
+*.bbl
+*.bcf
+*.dvi
+*.log
+*.run.xml
+*.fls
+*.blg
