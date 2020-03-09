@@ -43,7 +43,7 @@
 \abstract{%
 High-Energy Physics has evolved a rich set of software packages that need to
 work harmoniously to carry out the key software tasks needed by experiments.
-The problem of consistently building and deploying these software packages as a
+The problem of consistently building and deploying these packages as a
 coherent software stack is one that is shared across the HEP community. To that
 end the HEP Software Foundation Packaging Working Group has worked to identify
 common solutions that can be used across experiments, with an emphasis on
@@ -65,16 +65,16 @@ show how support for a build environment for software developers is provided.
 \section{Introduction}
 \label{intro}
 
-Software plays a critical part in the lifecycle of High-Energy Physics (HEP)
+Software plays a critical role in the lifecycle of High-Energy Physics (HEP)
 experiments. From the high-level triggers of the experiments, through the
 reconstruction chain, to the identification of analysis objects, and finally to
 the final physics analysis, software is ubiquitous. In parallel, the simulation
 chain, generating physics events and simulating their passage through the
-detector compliments this data driven chain and is entirely done by software.
+detector, compliments this data driven chain and is entirely done by software.
 
 As HEP software has become more sophisticated so the dependencies on libraries
 and supporting software components has become more important. This leads to the need to
-build software as a deep and wide stack, which, for a modern HEP experiment, may
+build software as a deep and wide (Define these?) stack, which, for a modern HEP experiment, may
 encompass several hundred packages. These range from packages which are entirely generic
 parts of a modern Linux environment, to HEP dedicated libraries all the way up to
 experiment specific code. The model of a typical HEP application is shown in
@@ -90,12 +90,12 @@ HEP packages to, finally, experiment specific software.}
 \label{fig:stack}
 \end{figure}
 
-This deep and wide set of dependencies needs to be managed carefully, thus HEP
+This deep and wide set of dependencies needs to be managed carefully (why?), thus HEP
 software needs to be built coherently as a \emph{software stack}. As much of
 this work is common between experiments, the HEP Software Foundation (HSF) has
 had a long standing \emph{Packaging Working Group}\cite{HSFPWG} that has attempted to find
 common solutions to this problem. In this paper we report on the recent activity
-of the group and, in particular, on the Spack build manager which is being
+of the group and, in particular, on the Spack package manager\cite{10.1145/2807591.2807623} which is being
 trialled as a possible common solution for multiple experiments.
 
 \section{HSF Packaging Working Group}
@@ -108,7 +108,7 @@ maintaining their experiments' software. The group focused on:
 \begin{itemize}
     \item Common build recipes and tools
     \item How to take most advantage of technologies like containers
-    \item Proper support for developers in our collaborations
+    \item Proper support for developers and users in our collaborations
 \end{itemize}
 
 The group organised a series of meetings that reviewed packaging
@@ -130,7 +130,7 @@ The main use cases identified were:
             (e.g. for different versions of the software or for 
             using different compiler options)
         \item Toolchains and libraries should be able to be used from
-            external sources
+            external sources (i.e. not under the control of the packaging tool)
         \item The build process should be optimised to re-use compatible
             binary artefacts from previous builds
         \item Incremental builds should be supported, where only a subset
@@ -160,7 +160,7 @@ The main use cases identified were:
     \item Development
     \begin{itemize}
         \item Developers should be able to compile against any deployed release
-        \item Developer built packages must take precedence in the runtime
+        \item Developer-built packages must take precedence in the runtime
             development environment
         \item Developers can setup an environment to recompile any external
             or component of the software stack
@@ -203,15 +203,15 @@ in the addition of a dedicated HEP channel to the Spack Slack community.
     \item Heirarchy of build recipes supported
     \item Binary caches supported for build artefacts
     \item Use of system or externally pre-built packages
-    \item Relocatable installation supported from the binray cache
+    \item Relocatable installation supported from the binary cache
     \item Use of RPATH to express dependencies in a robust way, ensuring that
         multiple versions of binares and libraries can co-exist without
         interference
-    \item Downstream instances of Spack can rely take packages
-        build by an upstream Spack instance (so-called Spack chains)
+    \item Downstream instances of Spack can reuse packages
+        installed in an upstream Spack instance (so-called Spack chains)
 \end{itemize}
 
-Given the large feature set of Spack, the sigificiant scientific user community
+Given the large feature set of Spack, the significant scientific user community
 (much larger than HEP or even physics) and the postitive engagement with the
 core developers, a number of HEP projects began to use the tool for their
 software builds.
@@ -230,7 +230,7 @@ studies began the most mature software stack available was the LCG stack, built
 by the CERN EP-SFT SPI project\cite{LCGStack}. Therefore, as an expedient
 decision, the additional packages for FCC were built on top of exisiting
 LCG releases. This required extensive use of Spack's ability to take pre-built
-software, by specifiying a package's source in \texttt{packages.yaml}, e.g., to
+software, by specifiying a package's source in a "\texttt{packages.yaml}" configuration file, e.g., to
 use the LCG built version of ROOT:
 
 \begin{verbatim}
@@ -262,7 +262,7 @@ the packages into the final location under \texttt{/cvmfs/fcc.cern.ch}, where
 it becomes globally accessible to users.
 
 One problematic issue was that re-running Spack on the CVMFS master effectively
-locked the architectire, e.g. \texttt{x86\_64-centos7}, to that of the CVMFS
+locked the architecture, e.g. \texttt{x86\_64-centos7}, to that of the CVMFS
 host machine. To install for different architectures a workaround, using a
 Docker container with the target architecture, was used. However, recent
 enhancments to Spack have allowed an option for Spack to install for any
@@ -281,19 +281,19 @@ an off-the-shelf solution for package building and distribution is very
 desirable. A previous solution, based on homebrew\cite{homebrew} had effectively
 reached the limits of its capabilities.
 
-SuperNEMO software is not installed onto CVMFS and the main build targets are
+SuperNEMO software is not currently deployed via CVMFS and the main build targets are
 native OS installation and Docker containers. A wide variety of platforms are
 supported: CentOS7, Ubuntu 18.04, macOS Mojave/Catalina natively; plus CentOS7
 Docker/Singularity images. Similar to FCC, use is made of Spack's
 \texttt{packages.yaml} feature to reuse appropriate system binaries, which greatly
 reduces the build time (particularly for X11 and OpenGL packages).
 
-Spack's herirachical package definition features are exploited to allow for
+Spack's hierarchical package definition features are exploited to allow for
 some customised versions of particular packages, such as Qt, while relying on
 the main Spack repository for the vast majority of packages.
 
-[For Ben here too give a few more details, like how the container build is managed -
-do you use a binary cache? build directly in the container?]
+At present, containers are built from scratch though use of a binary cache for this
+and eventual CVMFS deployment is in progress.
 
 \subsection{Key4hep Prototype}
 \label{key4hep}
@@ -361,7 +361,7 @@ HEP software stack can be supported relatively easily, taking advantage
 of Spack features and the large number of package recipes that are
 maintained for and by the scientific community.
 
-Work on utilising Spack as the build orchestrator is now continuing, in the
+Work on utilising Spack as the package manager is now continuing, in the
 context of the Key4hep project and as a replacement for the classic approach
 to building the LCG stack.
 
