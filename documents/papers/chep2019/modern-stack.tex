@@ -73,10 +73,12 @@ chain, generating physics events and simulating their passage through the
 detector, compliments this data driven chain and is entirely done by software.
 
 As HEP software has become more sophisticated so the dependencies on libraries
-and supporting software components has become more important. This leads to the need to
-build software as a deep and wide (Define these?) stack, which, for a modern HEP experiment, may
-encompass several hundred packages. These range from packages which are entirely generic
-parts of a modern Linux environment, to HEP dedicated libraries all the way up to
+and supporting software components has become more important. This leads to the
+need to build modern HEP experiment software as both a deep stack, with many
+dependencies building on top of one another; and as a wide stack, with several
+hundred packages in total performing many different functions.
+These packages range from entirely generic
+parts of a modern Linux environment, to HEP dedicated libraries, all the way up to
 experiment specific code. The model of a typical HEP application is shown in
 Figure \ref{fig:stack}.
 
@@ -90,8 +92,9 @@ HEP packages to, finally, experiment specific software.}
 \label{fig:stack}
 \end{figure}
 
-This deep and wide set of dependencies needs to be managed carefully (why?), thus HEP
-software needs to be built coherently as a \emph{software stack}. As much of
+This deep and wide set of dependencies needs to be managed carefully,
+particularly for reasons of build consistency and validation (see \S\ref{hsfpwg}), thus HEP
+software should be built coherently as a \emph{software stack}. As much of
 this work is common between experiments, the HEP Software Foundation (HSF) has
 had a long standing \emph{Packaging Working Group}\cite{HSFPWG} that has attempted to find
 common solutions to this problem. In this paper we report on the recent activity
