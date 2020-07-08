@@ -10,3 +10,6 @@
 *.blg
 *.fdb_latexmk
 *.synctex.gz
+
+# VS Code workspace dictionary
+.vscode
