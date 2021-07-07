@@ -1,0 +1,40 @@
+#include "SLPApplicationPaths.h"
+
+#include "SLPackage_binreloc.h"
+#include <cstdlib>
+
+namespace {
+//! Initialize binreloc if needed
+int initBinreloc() {
+  int errorCode {0};
+  static bool isInit {false};
+  if (!isInit) {
+    BrInitError err;
+    errorCode = br_init(&err);
+  }
+  return errorCode;
+}
+}
+
+namespace SLP {
+const std::string& getApplicationDir() {
+  static std::string appDir;
+  if (appDir.empty()) {
+    initBinreloc();
+    char* myExeDir = br_find_exe_dir("");
+    appDir = myExeDir;
+    free(myExeDir);
+  }
+  return appDir;
+}
+
+const std::string& getResourceDir() {
+  static std::string binToResPath("@SLP_BINDIR_TO_RESOURCEDIR@");
+  static std::string resourceDir;
+  if (resourceDir.empty()) {
+    resourceDir = getApplicationDir() + "/" + binToResPath;
+  }
+  return resourceDir;
+}
+
+} // namespace HSFReloc

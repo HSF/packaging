@@ -1,0 +1,1 @@
+hello from builtin SLPackage resource file!
